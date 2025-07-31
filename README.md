@@ -1,11 +1,11 @@
 # CITS3200-project
 
-# Group members
-Rania Khan
-James Felstead
-Peter Fang
-Chunyu Zheng
-Hazel Wang
+### Group members
+Rania Khan  
+James Felstead  
+Peter Fang  
+Chunyu Zheng  
+Hazel Wang  
 
 
 MENTOR: Neha Sahai Sapra <nehasahai.sapra@westpac.com.au>
