@@ -1,12 +1,16 @@
+import os
+from dotenv import load_dotenv
 import time
 from openai import OpenAI
 
+load_dotenv()
+
 # It's best practice to use an environment variable for your API key
 # OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY") 
-client = OpenAI(api_key="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") 
-
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
 # Assuming you have the client object and the response ID
-response_id = 'resp_68a1ed670b7081a08ba4ea39353ae5430bf90dfa0fa23e04'
+response_id = 'N/A'
 
 # The `responses.poll` method is a simplified way to do this
 # Note: The specific method name may vary depending on the most recent SDK
