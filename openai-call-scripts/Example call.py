@@ -1,11 +1,13 @@
 import os
+from dotenv import load_dotenv
 from openai import OpenAI
+
+load_dotenv()
 
 # It's best practice to use an environment variable for your API key
 # OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY") 
-client = OpenAI(api_key="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") 
-#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
-#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
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Define the research task with a system message and a user query
 system_message = """
