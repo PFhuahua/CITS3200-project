@@ -3,8 +3,9 @@ from openai import OpenAI
 
 # It's best practice to use an environment variable for your API key
 # OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY") 
-client = OpenAI(api_key="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") 
-#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
+client = OpenAI(api_key="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") 
+#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
+#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
 
 # Define the research task with a system message and a user query
 system_message = """
@@ -22,12 +23,14 @@ Do:
 
 Do not try to read the data in any way, just return the download links to the documents and the metadata.
 In the case of countries that don't have publicly available census data, return the country's name and that it cannot be found as well as the search queries used.
+
+The final output should be basically a dot point list with country name as headings, under which each link is given with notes on the country, year, specific province and any other metadata recorded.
 """
 
-user_query = "Find the census data for all countries in Africa, including the year of the census, the download links to the documents and all relevant metadata about the sources of said links."
+user_query = "Give me the download links to all the census data of Africa including all time periods"
 
 response = client.responses.create(
-    model="o3-deep-research-2025-06-26",
+    model="o4-mini-deep-research",
     input=[
         {"role": "system", "content": [{"type": "input_text", "text": system_message}]},
         {"role": "user", "content": [{"type": "input_text", "text": user_query}]}
