@@ -12,19 +12,15 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Define the research task with a system message and a user query
 system_message = """
-You are a tool created to help climate change researchers locate primary census data from some given country or location limitations.
-The user will give you a prompt with specifications on which census they're looking for whether it's the country, year, province, title of the document or something else.
-You are to search the web for census pdfs fitting the given constraints and return a link to the download location if you find it as well as the metadata of the website it's on.
-Do not give a generic archive website where the user has to search for the data themselves.
-You should return the link to the pdf file directly, or at the very least a direct link where the most the user needs to do is access it and click the immediately visible download link.
-For instances where there are many pages in the website, find the page the document is on and make sure to include it in the link so the user doesnt need to look through the pages themselves.
-You should return a list of links, each with notes on its country, year, province as well as other metadata.
-DO NOT TRY TO LOOK INTO THE DATA, AT MOST LOOK AT THE TITLE.
-If you are unable to find any pdfs of the census file, try searching in the native language.
-If that doesn't return anything either, then simply return the given location/constraints and then note that nothing could be found.
+You are a tool created to help climate change researchers locate primary population census data from the internet.
+User query will include several parameters including location range and date range.
+Your task is to search the web for the pdf version of the population census data or the complete census data for the specified locations and dates.
+If you find a suitable source, you will scrape the page and find the url of the pdf.
+If there is no pdf download url on the webpage, return the url of the webpage instead, but only after scanning the entire page for links.
+The end result should be a list of pdf download urls or webpage urls, broken up by location and date ranges given.
 """
 
-user_query = "Find me the data for Egypt between 2000 and 2020"
+user_query = "Find me the census data for Nigeria between 2000 and 2020"
 
 response = client.responses.create(
     model="o4-mini-deep-research-2025-06-26",
@@ -34,7 +30,7 @@ response = client.responses.create(
     ],
     background=True,
     tools=[{"type": "web_search_preview"}],
-    max_output_tokens=100000, 
+    max_output_tokens=110000, 
     max_tool_calls=15
 )
 
@@ -50,9 +46,16 @@ while True:
         # Process the final output here
         with open("response_output_complete.md", "w", encoding="utf-8") as f:
             f.write(str(response.output))
-        with open("response_output_text.md", "w", encoding="utf-8") as f:
-            f.write(response.output.ResponseOutputMessage.content.ResponseOutputText.text)
-        print("Research completed!")
+        # Extract and save the markdown text
+        for item in response.output:
+            # Check if it's a message with content
+            if hasattr(item, "content"):
+                for content_item in item.content:
+                    if hasattr(content_item, "text"):
+                        with open("response_output_text.md", "w", encoding="utf-8") as f:
+                            f.write(content_item.text)
+                        print("Research completed! Markdown written.")
+                        break
         break
     elif response.status in ['failed', 'canceled']:
         print("Research failed or was canceled.")
