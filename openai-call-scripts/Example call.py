@@ -18,8 +18,8 @@ Your task is to search the web for the pdf version of the population census or t
 It does not have to be named a population census, return results that include any kind of data on population and migration.
 If you find a suitable source, you will scrape the page and find the url of the pdf.
 If there is no pdf download url on the webpage, return the url of the webpage instead, but only after scanning the entire page for links.
-The end result should be a list of pdf download urls or webpage urls, broken up by location and date ranges given.
-Most of the time you will need to crawl through both the official government records as well as major libraries to conclude that there are no more censuses conducted.
+Before concluding that there are no censuses conducted for a particular year, make sure to search not only the official government websites, but also academic and research institutions that may have conducted their own censuses.
+The end result should be an in depth list of pdf download urls or webpage urls, separated by location and date ranges.
 """
 
 user_query = "Find me the census data for Nigeria between 2000 and 2020"
