@@ -12,11 +12,16 @@ import time
 import requests
 import os
 from urllib.parse import urlparse
+from urllib.parse import urljoin
+
+# Example urls:
+# https://www.insee.fr/fr/statistiques/6683035?sommaire=6683037#consulter
+# https://www.homeaffairs.gov.au/research-and-statistics/statistics/visa-statistics/live/migration-program
 
 # Base URL to scrape from
-url = 'https://www.homeaffairs.gov.au/research-and-statistics/statistics/visa-statistics/live/migration-program'
+url = 'https://www.insee.fr/fr/statistiques/6683035?sommaire=6683037#consulter'
 # Basic PDF filename filter
-Filter = "2012"
+Filter = None
 
 
 start = time.time() 
@@ -33,16 +38,20 @@ pdf_refs = re.findall(r"\b\S+\.pdf\b", html_content, re.IGNORECASE)
 for pdf in pdf_refs: print(pdf) 
 
 # Filter out the matches
-filtered = [s for s in pdf_refs if isinstance(s, str) and Filter in s]
+if Filter != None:
+    filtered = [s for s in pdf_refs if isinstance(s, str) and Filter in s]
+else: filtered = pdf_refs
+
 FileSizeFilter = "data-getfilesize="
 filtered = [s for s in filtered if isinstance(s, str) and FileSizeFilter not in s]
 print(f"\n{len(filtered)} / {len(pdf)} PDFs match filters")
 
 # List all filtered pdf file names and sizes
+
 Avalible_pdfs = []
 for pdf in  filtered:
     PDF_name = pdf.replace('href="', '').replace('"', '')
-    response = requests.head(base_url + PDF_name)
+    response = requests.head(urljoin(base_url,PDF_name))
     print("\n")
     print(PDF_name[1:])
     if 'Content-Length' in response.headers:
@@ -53,6 +62,8 @@ for pdf in  filtered:
         size_kb = size_bytes / 1024
         print(f"PDF size: {size_bytes} bytes ({size_kb:.2f} KB)")
     else:
+        size_bytes = None
+        Avalible_pdfs.append([PDF_name,size_bytes])
         print("No Content-Length header. Need to download file to check size.")
 
 
