@@ -2,6 +2,7 @@ import re
 import requests
 from urllib.parse import urlparse, urljoin
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -12,72 +13,62 @@ headers = {
     "Referer": "https://www.google.com/"
 }
 
-def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True):
-    """
-    Scrape a webpage for PDF links.
-
-    Args:
-        url (str): The webpage URL to scrape.
-        filter_str (str, optional): Only include PDFs containing this substring. Defaults to None.
-        get_sizes (bool, optional): Whether to fetch Content-Length headers for sizes. Defaults to True.
-
-    Returns:
-        list[dict]: List of found PDFs, each as dict with keys:
-            - 'url': Absolute URL to the PDF
-            - 'filename': Filename extracted from the URL
-            - 'size': Size in bytes (if available), otherwise None
-    """
-    # Parse base URL
-    parsed_url = urlparse(url)
-    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
-
-    # Get HTML content
-    try:
-        response = requests.get(url, headers=headers,  timeout=10)
-        response.raise_for_status()
-        html_content = response.text[:10000]
-
-        print(f"Successfully fetched: {url}")
-    except requests.exceptions.HTTPError as e:
-        print(f" Skipped {url} due to HTTP error: {e}")
-        return None
-    except requests.exceptions.Timeout as e:
-        print(f" Skipped {url} due to timeout: {e}")
-        return None
-    except requests.exceptions.RequestException as e:
-        print(f" Skipped {url} due to request error: {e}")
-        return None
-    # Find PDF references
-    pdf_refs = re.findall(r'href=["\'](.*?\.pdf(?:\?.*?)?)["\']', html_content, re.IGNORECASE)
-
-
-    # Apply filter if given
-    if filter_str:
-        pdf_refs = [s for s in pdf_refs if filter_str in s]
-
-    # Exclude unwanted matches (like file size placeholders)
-    pdf_refs = [s for s in pdf_refs if "data-getfilesize=" not in s]
-
-    # Normalize PDF links
+def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 15):
     pdf_links = []
-    for ref in pdf_refs:
-        pdf_url = ref.replace('href="', '').replace('"', '')
-        full_url = urljoin(base_url, pdf_url)
-        filename = os.path.basename(full_url)
 
-        size = None
-        if get_sizes:
-            try:
-                head_resp = requests.head(full_url, allow_redirects=True, timeout=5)
-                if 'Content-Length' in head_resp.headers:
-                    size = int(head_resp.headers['Content-Length'])
-            except requests.RequestException:
-                size = None
+    def _scrape():
+        # Parse base URL
+        parsed_url = urlparse(url)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
 
-        pdf_links.append({
-            "url": full_url,
-            "filename": filename,
-            "size": size
-        })
+        # Get HTML content
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            html_content = response.text[:1000]
+            print(f"Successfully fetched: {url}")
+        except requests.exceptions.RequestException as e:
+            print(f"Skipped {url} due to request error: {e}")
+            return pdf_links  # Return what we have (empty list)
 
-    return pdf_links
+        # Find PDF references
+        pdf_refs = re.findall(r'href=["\'](.*?\.pdf(?:\?.*?)?)["\']', html_content, re.IGNORECASE)
+
+        # Apply filter if given
+        if filter_str:
+            pdf_refs = [s for s in pdf_refs if filter_str in s]
+
+        # Exclude unwanted matches
+        pdf_refs = [s for s in pdf_refs if "data-getfilesize=" not in s]
+
+        # Normalize PDF links
+        for ref in pdf_refs:
+            full_url = urljoin(base_url, ref)
+            filename = os.path.basename(full_url)
+            size = None
+
+            if get_sizes:
+                try:
+                    head_resp = requests.head(full_url, allow_redirects=True, timeout=5)
+                    if 'Content-Length' in head_resp.headers:
+                        size = int(head_resp.headers['Content-Length'])
+                except requests.RequestException:
+                    size = None
+
+            pdf_links.append({
+                "url": full_url,
+                "filename": filename,
+                "size": size
+            })
+
+        return pdf_links
+
+    # Use ThreadPoolExecutor to enforce a total timeout
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_scrape)
+        try:
+            return future.result(timeout=max_time)
+        except TimeoutError:
+            print("Operation exceeded 15 seconds, returning partial results.")
+            return pdf_links  # whatever was collected before timeout
+
