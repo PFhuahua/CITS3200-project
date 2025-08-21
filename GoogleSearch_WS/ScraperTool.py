@@ -33,16 +33,19 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True):
 
     # Get HTML content
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers,  timeout=10)
         response.raise_for_status()
-        html_content = response.text
+        html_content = response.text[:10000]
 
         print(f"Successfully fetched: {url}")
     except requests.exceptions.HTTPError as e:
         print(f" Skipped {url} due to HTTP error: {e}")
         return None
+    except requests.exceptions.Timeout as e:
+        print(f" Skipped {url} due to timeout: {e}")
+        return None
     except requests.exceptions.RequestException as e:
-        print(f"⚠️ Skipped {url} due to request error: {e}")
+        print(f" Skipped {url} due to request error: {e}")
         return None
     # Find PDF references
     pdf_refs = re.findall(r'href=["\'](.*?\.pdf(?:\?.*?)?)["\']', html_content, re.IGNORECASE)
