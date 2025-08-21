@@ -9,7 +9,7 @@ filters = ["wikipedia"]
 
 Query = Country + Year + "\"census\"\"migration\"\"data\""
 results = []
-for link in search(Query , num_results=8):
+for link in search(Query , num_results=24):
         if not any(f in link for f in filters):
               
               if(".pdf" in link): results.append(link)
