@@ -3,11 +3,14 @@ from ScraperTool import scrape_pdfs
 from ScraperTool import process_pdf_link
 import time
 
-
-filters = ["wikipedia"]
+Filters = ["wikipedia"]
 ExactTags = []
-NonExactTags = ["Kenya","census","migration","data","2020"]
+NonExactTags = ["austria","census","migration","data","2018"]
 Filesize = None
+MaxPDFs = 5
+ResultsSearched = 10
+
+
 
 
 start = time.time() 
@@ -22,8 +25,8 @@ Query = ExactTags + " " + NonExactTags
 
 FULL_RESULTS = []
 results = []
-for link in search(Query, num_results=20):
-    if not any(f in link for f in filters):
+for link in search(Query, num_results= ResultsSearched):
+    if not any(f in link for f in Filters):
         if ".pdf" in link.lower():
             # Process PDF link
             pdf_info = process_pdf_link(link)
@@ -37,9 +40,9 @@ for link in search(Query, num_results=20):
             for item in scraped:
                 FULL_RESULTS.append(item)
                 results.append((item["url"], item["size"]))  # store as (url, size) pair
-                if len(results) > 4:  # break inner loop if too many
+                if len(results) > MaxPDFs:  # break inner loop if too many
                     break
-    if len(results) > 4:  # break outer loop if too many
+    if len(results) > MaxPDFs:  # break outer loop if too many
         break
 
 unique_results = list(set(results))
