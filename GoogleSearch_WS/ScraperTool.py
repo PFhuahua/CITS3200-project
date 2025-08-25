@@ -30,7 +30,7 @@ def process_pdf_link(full_url, get_sizes=True):
         "size": size
     }
 
-def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 15):
+def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 50):
     pdf_links = []
 
     def _scrape():
@@ -42,7 +42,8 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         try:
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
-            html_content = response.text[:1000]
+            html_content = response.text[:100000]
+            print(len(html_content))
             print(f"Successfully fetched: {url}")
         except requests.exceptions.RequestException as e:
             print(f"Skipped {url} due to request error: {e}")
@@ -71,6 +72,6 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         try:
             return future.result(timeout=max_time)
         except TimeoutError:
-            print("Operation exceeded 15 seconds, returning partial results.")
+            print("Operation exceeded 50 seconds, returning partial results.")
             return pdf_links  # whatever was collected before timeout
 
