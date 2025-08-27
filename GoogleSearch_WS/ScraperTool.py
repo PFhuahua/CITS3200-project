@@ -50,7 +50,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
             return pdf_links
 
         # Find PDF references
-        pdf_refs = re.findall(r'href=["\'](.*?\.pdf(?:\?.*?)?)["\']', html_content, re.IGNORECASE)
+        pdf_refs = re.findall(r'href=["\']([^"\'>]+\.pdf(?:\?[^"\'>]*)?)["\']', html_content, re.IGNORECASE)
 
         # Apply filter if given
         if filter_str:
