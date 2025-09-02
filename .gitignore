@@ -56,3 +56,7 @@ htmlcov/
 *.log
 *.tmp
 *.temp
+
+.cursor/
+
+.cursor
