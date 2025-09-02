@@ -17,6 +17,7 @@ def process_pdf_link(full_url, get_sizes=True):
     """Process a single PDF URL to extract filename and optionally size."""
     filename = os.path.basename(full_url)
     size = None
+    content_type = None
     if get_sizes:
         try:
             head_resp = requests.head(full_url, allow_redirects=True, timeout=5)
@@ -32,6 +33,7 @@ def process_pdf_link(full_url, get_sizes=True):
                 size = int(head_resp.headers['Content-Length'])
         except requests.RequestException:
             size = None
+            content_type = None
     return {
         "url": full_url,
         "filename": filename,
