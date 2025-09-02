@@ -20,6 +20,14 @@ def process_pdf_link(full_url, get_sizes=True):
     if get_sizes:
         try:
             head_resp = requests.head(full_url, allow_redirects=True, timeout=5)
+            #print(f"\n{filename}\n{full_url}\n{head_resp.headers}\n")
+            content_type = head_resp.headers.get("Content-Type", "").lower()
+
+            # 404 PDF not found
+            if content_type == "text/html; charset=utf-8":
+                return None
+            
+            # File Size
             if 'Content-Length' in head_resp.headers:
                 size = int(head_resp.headers['Content-Length'])
         except requests.RequestException:
@@ -27,7 +35,8 @@ def process_pdf_link(full_url, get_sizes=True):
     return {
         "url": full_url,
         "filename": filename,
-        "size": size
+        "size": size,
+        "filetype": content_type
     }
 
 def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 50):
@@ -42,8 +51,8 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         try:
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
-            html_content = response.text[:100000]
-            print(len(html_content))
+            html_content = response.text[:500000]
+            #print(len(html_content))
             print(f"Successfully fetched: {url}")
         except requests.exceptions.RequestException as e:
             print(f"Skipped {url} due to request error: {e}")
@@ -62,7 +71,9 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         # Process each PDF link using separate function
         for ref in pdf_refs:
             full_url = urljoin(base_url, ref)
-            pdf_links.append(process_pdf_link(full_url, get_sizes=get_sizes))
+            pdf_info = process_pdf_link(full_url, get_sizes=get_sizes)
+            if pdf_info != None:
+                pdf_links.append(pdf_info)
 
         return pdf_links
 
