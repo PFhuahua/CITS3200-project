@@ -3,9 +3,9 @@ from ScraperTool import scrape_pdfs
 from ScraperTool import process_pdf_link
 import time
 
-Filters = ["wikipedia"]
+Filters = ["wikipedia","statista","worldbank","unstats"]
 ExactTags = []
-NonExactTags = ["austria","census","migration","data","2018"]
+NonExactTags = ["Uganda","census","migration","data","2014"]
 Filesize = None
 MaxPDFs = 5
 ResultsSearched = 10
