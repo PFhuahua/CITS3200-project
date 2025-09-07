@@ -1,0 +1,116 @@
+import re
+import requests
+from urllib.parse import urlparse, urljoin
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+import google.generativeai as genai
+from dotenv import load_dotenv
+import json
+
+load_dotenv()
+# Configure Gemini
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+with open("output_sumary.md", "w", encoding="utf-8") as f:
+    f.write("# AI Website Breakdown Summary\n\n")
+
+model = genai.GenerativeModel(
+    model_name="gemini-2.5-pro",
+    system_instruction=(
+        "You are a website reader."
+        "Given a website's HTML source code, you will read it and produce the website's information such as:"
+        "- What type of website it is" 
+        "- Who runs the website"
+        "- Contact information of the owner"
+        "- If there are PDF links, find the PDF links and the description provided for each PDF"
+    ),
+)
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/115.0 Safari/537.36",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Referer": "https://www.google.com/"
+}
+
+def process_pdf_link(full_url, get_sizes=True):
+    """Process a single PDF URL to extract filename and optionally size."""
+    filename = os.path.basename(full_url)
+    size = None
+    content_type = None
+    if get_sizes:
+        try:
+            head_resp = requests.head(full_url, allow_redirects=True, timeout=5)
+            #print(f"\n{filename}\n{full_url}\n{head_resp.headers}\n")
+            content_type = head_resp.headers.get("Content-Type", "").lower()
+
+            # 404 PDF not found
+            if content_type == "text/html; charset=utf-8":
+                return None
+            
+            # File Size
+            if 'Content-Length' in head_resp.headers:
+                size = int(head_resp.headers['Content-Length'])
+        except requests.RequestException:
+            size = None
+            content_type = None
+    return {
+        "url": full_url,
+        "filename": filename,
+        "size": size,
+        "filetype": content_type
+    }
+
+def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 120):
+    pdf_links = []
+
+    def _scrape():
+        # Parse base URL
+        parsed_url = urlparse(url)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+
+        # Get HTML content
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            html_content = response.text[:500000]
+            #print(len(html_content))
+            print(f"Successfully fetched: {url}, sending to AI")
+            AIresponse = model.generate_content(html_content)
+            with open("output_sumary.md", "a", encoding="utf-8") as f:
+                f.write(f"\nFor URL: {url}\n")
+                f.write(AIresponse.text+"\n")
+            print("AI breakdown written to output_sumary.md")
+        except requests.exceptions.RequestException as e:
+            print(f"Skipped {url} due to request error: {e}")
+            return pdf_links
+
+        # Find PDF references
+        pdf_refs = re.findall(r'href=["\']([^"\'>]+\.pdf(?:\?[^"\'>]*)?)["\']', html_content, re.IGNORECASE)
+
+        # Apply filter if given
+        if filter_str:
+            pdf_refs = [s for s in pdf_refs if filter_str in s]
+
+        # Exclude unwanted matches
+        pdf_refs = [s for s in pdf_refs if "data-getfilesize=" not in s]
+
+        # Process each PDF link using separate function
+        for ref in pdf_refs:
+            full_url = urljoin(base_url, ref)
+            pdf_info = process_pdf_link(full_url, get_sizes=get_sizes)
+            if pdf_info != None:
+                pdf_links.append(pdf_info)
+
+        return pdf_links
+
+    # Run scraper with total timeout
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_scrape)
+        try:
+            return future.result(timeout=max_time)
+        except TimeoutError:
+            print("Operation exceeded 50 seconds, returning partial results.")
+            return pdf_links  # whatever was collected before timeout
+
