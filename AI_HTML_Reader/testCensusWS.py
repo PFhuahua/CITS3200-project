@@ -5,7 +5,7 @@ import time
 
 Filters = ["wikipedia","statista","worldbank","unstats"]
 ExactTags = []
-NonExactTags = ["Tunisia","General population housing census","National Record","1984","volume 4"]
+NonExactTags = ["Algeria","General census of Algeria","1897","pdf"]
 Filesize = None
 MaxPDFs = 5
 ResultsSearched = 10

@@ -79,7 +79,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
             print(f"Successfully fetched: {url}, sending to AI")
             AIresponse = model.generate_content(html_content)
             with open("output_sumary.md", "a", encoding="utf-8") as f:
-                f.write(f"\nFor URL: {url}\n")
+                f.write(f"\n## For URL: {url}\n")
                 f.write(AIresponse.text+"\n")
             print("AI breakdown written to output_sumary.md")
         except requests.exceptions.RequestException as e:
