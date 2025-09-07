@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os, csv, time, json, argparse, pathlib, hashlib, base64, re
+import os, csv, time, json, argparse, pathlib, hashlib, base64, re, math
 from typing import Optional, List, Dict, Literal
 from pydantic import BaseModel, ValidationError
-import json
+import unicodedata
+import pycountry
 
 DEFAULT_TOP_K = 3
 YEAR_MIN, YEAR_MAX = 1900, 2035 #TODO adjust as needed
@@ -38,20 +39,34 @@ def color_to_method(c: str) -> str:
     return {"green":"download", "yellow":"remote_request", "red":"physical"}.get(c, "physical")
 
 def _now_iso() -> str:
-    return time.strftime("%Y-%m-%dT%H-%M-%SZ", time.gmtime())
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+def _atomic_write_json(obj, path: str):
+    tmp = path + ".tmp"
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
 
 # Country name to ISO2 mapping
-with open("name_to_iso.json", encoding="utf-8") as f:
-    NAME_TO_ISO = json.load(f)
+
+def _strip_accents(s: str) -> str:
+    return "".join(
+        c for c in unicodedata.normalize("NFD", s)
+        if unicodedata.category(c) != "Mn"
+    )
 
 def name_to_iso2(country_name: str) -> str:
     if not country_name:
         return "XX"
-    key = country_name.strip().lower()
-    if key in NAME_TO_ISO:
-        return NAME_TO_ISO[key]
-    key2 = key.replace("’","'").replace("é","e").replace("á","a")
-    return NAME_TO_ISO.get(key2, "XX")
+    key = _strip_accents(country_name.strip().lower())
+    try:
+        country = pycountry.countries.lookup(key)
+        return country.alpha_2 
+    except LookupError:
+        return "XX"
 
 # Candidate generator (mockdata)
 # TODO replace with API calls
@@ -101,8 +116,9 @@ def ensure_iso(country_iso: Optional[str], country_name: Optional[str]) -> Optio
         return iso if iso != "XX" else None
     return None
 
-# Main batch
-def run_batch(csv_in: str, csv_out: str, err_log: str, top_k: int = DEFAULT_TOP_K):
+def run_batch(csv_in: str, csv_out: str, err_log: str,
+              top_k: int = DEFAULT_TOP_K,
+              log_path: str = "exports/progress.json"):
     pathlib.Path(os.path.dirname(csv_out) or ".").mkdir(parents=True, exist_ok=True)
     pathlib.Path(os.path.dirname(err_log) or ".").mkdir(parents=True, exist_ok=True)
 
@@ -118,10 +134,50 @@ def run_batch(csv_in: str, csv_out: str, err_log: str, top_k: int = DEFAULT_TOP_
         print("[WARN] no rows; CSV must have headers like: year,country_name[,state_province][,query]")
         return
 
+    # progress state
+
+    start_ts = time.time()
+    run_id = _now_iso()            
+    now_ts = _now_iso()
+
+    status = {
+        "run_id": run_id,
+        "total": total,
+        "done": 0,
+        "ok": 0,
+        "fail": 0,
+        "start_ts": start_ts,
+        "last_msg": ""
+    }
+
+    def fmt_hms(sec: float) -> str:
+        sec = int(max(0, sec))
+        h = sec // 3600
+        m = (sec % 3600) // 60
+        s = sec % 60
+        return f"{h:02d}:{m:02d}:{s:02d}"
+
+    def write_status(msg: str = ""):
+        status["last_msg"] = msg
+        status["update_ts"] = time.time()
+        _atomic_write_json(status, log_path)
+
+    write_status("started")
+    def bump_progress(label: str = ""):
+        status["done"] += 1
+        elapsed = time.time() - start_ts
+        speed = status["done"] / elapsed if elapsed > 0 else 0.0
+        remain = max(0, total - status["done"])
+        eta = remain / speed if speed > 0 else 0.0
+        percent = (status["done"] / total * 100.0) if total > 0 else 0.0
+
+        print(f"[{status['done']}/{total}] {percent:5.1f}% | ok={status['ok']} fail={status['fail']} | "
+            f"elapsed={fmt_hms(elapsed)} | eta={fmt_hms(eta)}")
+
+        write_status(label or "progress")
+
     ok_rows: List[Dict] = []
     errs: List[Dict] = []
-    run_id = _now_iso()
-    now_ts = _now_iso()
 
     for i, row in enumerate(rows, start=1):
         q = (row.get("query") or "").strip()  # optional field, used only for logging/debugging
@@ -132,11 +188,18 @@ def run_batch(csv_in: str, csv_out: str, err_log: str, top_k: int = DEFAULT_TOP_
 
         if y is None:
             errs.append({"query": q or "(auto)", "error": "invalid_year", "detail": "Year required and must be within range"})
+            status["fail"] += 1
+            write_status("invalid_year")
             print(f"[SKIP] row {i}: invalid/missing year")
+            bump_progress("invalid_year")
             continue
+
         if not iso:
             errs.append({"query": q or "(auto)", "error": "missing_country", "detail": "country_name or country_iso is required (full name in dropdown)"})
+            status["fail"] += 1
+            write_status("missing_country")
             print(f"[SKIP] row {i}: missing country")
+            bump_progress("missing_country")
             continue
 
         display = q or f"census {iso} {y}"
@@ -144,8 +207,8 @@ def run_batch(csv_in: str, csv_out: str, err_log: str, top_k: int = DEFAULT_TOP_
 
         try:
             cands = build_candidates(iso, y, top_k=top_k, state_province=sp)
-            # flatten for CSV
             qid = _stable_id(display)[:6]
+            now_ts_row = _now_iso()
             for rank, m in enumerate(cands, start=1):
                 d = m.model_dump()
                 access = d["access"]
@@ -166,12 +229,20 @@ def run_batch(csv_in: str, csv_out: str, err_log: str, top_k: int = DEFAULT_TOP_
                     "access_priority": color_to_priority(access),
                     "source_url": d["source_url"],
                     "confidence": d.get("confidence", ""),
-                    "created_at": now_ts,
+                    "created_at": now_ts_row,
                 })
+            if cands:
+                status["ok"] += 1
         except ValidationError as ve:
             errs.append({"query": display, "error": "validation_error", "detail": ve.errors()})
+            status["fail"] += 1
+            write_status("validation_error")
         except Exception as e:
             errs.append({"query": display, "error": "build_candidates_error", "detail": str(e)})
+            status["fail"] += 1
+            write_status("build_candidates_error")
+        finally:
+            bump_progress()
 
     # write CSV
     if ok_rows:
@@ -220,17 +291,19 @@ def run_batch(csv_in: str, csv_out: str, err_log: str, top_k: int = DEFAULT_TOP_
             })
 
         json_out = os.path.splitext(csv_out)[0] + ".json"
-        with open(json_out, "w", encoding="utf-8") as f:
-            json.dump(nested, f, ensure_ascii=False, indent=2)
+        _atomic_write_json(nested, json_out)
         print(f"[OK] written {len(nested)} queries -> {json_out}")
+
     else:
         print("[WARN] no successful rows")
 
     # write errors
     if errs:
-        with open(err_log, "w", encoding="utf-8") as f:
-            json.dump(errs, f, ensure_ascii=False, indent=2)
+        _atomic_write_json(errs, err_log)
         print(f"[OK] errors logged -> {err_log}")
+
+    status["end_ts"] = time.time()
+    write_status("finished" if status["done"] == total else "finished_partial")
 
 # CLI
 if __name__ == "__main__":
@@ -240,5 +313,8 @@ if __name__ == "__main__":
     ap.add_argument("--out", default="exports/results.csv")
     ap.add_argument("--errors", default="exports/errors.json")
     ap.add_argument("--top_k", type=int, default=DEFAULT_TOP_K, help="candidates per query")
+    ap.add_argument("--log", help="Path to progress json (will be overwritten periodically)", default="exports/progress.json")
+    ap.add_argument("--verbose", action="store_true", help="Print extra logs")
+
     args = ap.parse_args()
-    run_batch(args.input, args.out, args.errors, top_k=args.top_k)
+    run_batch(args.input, args.out, args.errors, top_k=args.top_k, log_path=args.log)
