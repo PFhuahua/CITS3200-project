@@ -1,18 +1,17 @@
 import requests
-from googlesearch import search
 from ScraperTool import scrape_pdfs
 from ScraperTool import process_pdf_link
 import time
 
 
-Filters = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd."]
-ExactTags = ["The Census Results of the enumerated population - effective of 31st of October 1948 - Volume 2 - Non-Muslam Population & The Census Results of the enumerated population - effective of 31st of October 1948 - Volume 3 - Muslam Population"]
-NonExactTags = []
-Filesize = 3334
-MaxPDFs = 15
-ResultsSearched = 30
+Filters = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd.",".docx"]
+ExactTags = []
+NonExactTags = ["census","STATISTIQUE GÉNÉRAL DE LA FRANCE - RESULTATS STATISTIQUES DU DENOMBREMENT DE 1896 - PARIS - IMPRIMERIE NATIONALE",".pdf"]
+Filesize =  None
+MaxPDFs = 40
+ResultsSearched = 100
 
-api_key = "PUT API KEY HERE" #API KEY
+api_key = "API KEY" #API KEY
 Searchcx = "f492a293c453341a1"
 
 
@@ -40,6 +39,7 @@ while start_search_index <= ResultsSearched:
 
     if response.status_code == 200:
         data = response.json()
+        if int(data['searchInformation']['totalResults']) == 0: break
         for item in data.get('items', []):
             link = item['link']
             title = item['title']
