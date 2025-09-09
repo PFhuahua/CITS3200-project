@@ -5,13 +5,12 @@ from ScraperTool import process_pdf_link
 import time
 
 
-
 Filters = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd."]
-ExactTags = []
-NonExactTags = ["Census", "Uganda","2018","migration"]
-Filesize = None
+ExactTags = ["The Census Results of the enumerated population - effective of 31st of October 1948 - Volume 2 - Non-Muslam Population & The Census Results of the enumerated population - effective of 31st of October 1948 - Volume 3 - Muslam Population"]
+NonExactTags = []
+Filesize = 3334
 MaxPDFs = 15
-ResultsSearched = 15
+ResultsSearched = 30
 
 api_key = "PUT API KEY HERE" #API KEY
 Searchcx = "f492a293c453341a1"
@@ -52,14 +51,14 @@ while start_search_index <= ResultsSearched:
                     if pdf_info is None:
                         continue
                     FULL_RESULTS.append([pdf_info, item])
-                    results.append((pdf_info["url"], pdf_info["size"]))
+                    results.append((pdf_info["url"], pdf_info["size"],title,snippet))
                 else:
                     scraped = scrape_pdfs(link)
                     if scraped is None:
                         continue
                     for pdf in scraped:
                         FULL_RESULTS.append([pdf, item])
-                        results.append((pdf["url"], pdf["size"]))
+                        results.append((pdf["url"], pdf["size"],title,snippet))
                         if len(results) >= MaxPDFs:
                             break
             if len(results) >= MaxPDFs:
@@ -72,13 +71,14 @@ while start_search_index <= ResultsSearched:
     
     start_search_index += num_results  # Move to next block of results
 
-
 unique_results = list(set(results))
+
+
 
 print(f"\n\nPDF RESULTS FOR {Query}:\n")
 for i, url in enumerate(unique_results, start=1):
-    if url[1] == None: print(f"{i}. {url[0]} file size: UNKNOWN")
-    else: print(f"{i}. {url[0]}, file size: {round(url[1]/1000,0)} KB")
+    if url[1] == None: print(f"{i}. {url[0]} \nfile size: UNKNOWN.\nTitle: {url[2]}, \nsnippet: {url[3]}\n")
+    else: print(f"{i}. {url[0]}, \nfile size: {round(url[1]/1000,0)} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
 print("\n")
 
 end = time.time()
