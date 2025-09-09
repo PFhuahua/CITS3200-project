@@ -8,12 +8,12 @@ import time
 
 Filters = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd."]
 ExactTags = []
-NonExactTags = ["Census", "Uganda","2018","migration"]
+NonExactTags = ["Census", "Uganda","2018","migration",".pdf"]
 Filesize = None
 MaxPDFs = 5
 ResultsSearched = 10 # 10 IS MAX IN THIS VERSION
 
-api_key = "PUT API KEY HERE" # API KEY
+api_key = "PUT API KEY HERE" #API KE
 Searchcx = "f492a293c453341a1"
 
 
@@ -37,42 +37,37 @@ response = requests.get(url)
 print(response.status_code)
 if response.status_code == 200:
     data = response.json()
-    print(data)
     # Loop over the search results
     for item in data.get('items', []):
         link = item['link']          # URL
-        title = item['title']        # Title of page
+        title = item['title']        # Page title
         snippet = item['snippet']    # Description of page
-        Links.append(link)
+
+        if not any(f in link for f in Filters):
+            if ".pdf" in link.lower():
+                # Process PDF link
+                pdf_info = process_pdf_link(link)
+                if pdf_info == None: 
+                    continue
+                FULL_RESULTS.append([pdf_info,item])
+                results.append((pdf_info["url"], pdf_info["size"]))  # store as (url, size) pair
+            else:
+                # Non-PDF link -> scrape for PDFs
+                scraped = scrape_pdfs(link)
+                if scraped is None:
+                    continue
+                for pdf in scraped:
+                    FULL_RESULTS.append([pdf,item])
+                    results.append((item["url"], item["size"]))  # store as (url, size) pair
+                    if len(results) > MaxPDFs:  # break inner loop if too many
+                        break
+        if len(results) > MaxPDFs:  # break outer loop if too many
+            break
 else:
     print("Error:", response.status_code, response.text)
 
 
-
-for link in Links:
-    if not any(f in link for f in Filters):
-        if ".pdf" in link.lower():
-            # Process PDF link
-            pdf_info = process_pdf_link(link)
-            if pdf_info == None: 
-                continue
-            FULL_RESULTS.append(pdf_info)
-            results.append((pdf_info["url"], pdf_info["size"]))  # store as (url, size) pair
-        else:
-            # Non-PDF link -> scrape for PDFs
-            scraped = scrape_pdfs(link)
-            if scraped is None:
-                continue
-            for item in scraped:
-                FULL_RESULTS.append(item)
-                results.append((item["url"], item["size"]))  # store as (url, size) pair
-                if len(results) > MaxPDFs:  # break inner loop if too many
-                    break
-    if len(results) > MaxPDFs:  # break outer loop if too many
-        break
-
 unique_results = list(set(results))
-
 
 print(f"\n\nPDF RESULTS FOR {Query}:\n")
 for i, url in enumerate(unique_results, start=1):
