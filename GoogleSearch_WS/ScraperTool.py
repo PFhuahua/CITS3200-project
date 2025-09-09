@@ -57,8 +57,8 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
             response.raise_for_status()
 
             html_content = response.text
-            # Process in chunks to avoid holding everything in memory if huge
-            chunk_size = 10000
+            # Process HTML in chunks for effeciency
+            chunk_size = 1024
             pdf_refs = []
             for i in range(0, len(html_content), chunk_size):
                 chunk = html_content[i:i+chunk_size]
