@@ -8,12 +8,12 @@ import time
 
 Filters = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd."]
 ExactTags = []
-NonExactTags = ["Census", "Uganda","2018","migration",".pdf"]
+NonExactTags = ["Census", "Uganda","2018","migration"]
 Filesize = None
-MaxPDFs = 5
-ResultsSearched = 10 # 10 IS MAX IN THIS VERSION
+MaxPDFs = 15
+ResultsSearched = 15
 
-api_key = "PUT API KEY HERE" #API KE
+api_key = "PUT API KEY HERE" #API KEY
 Searchcx = "f492a293c453341a1"
 
 
@@ -26,45 +26,51 @@ if NonExactTags != []: NonExactTags = ' '.join(NonExactTags)
 else: NonExactTags = " "
 
 Query = ExactTags + " " + NonExactTags
-url = f"https://www.googleapis.com/customsearch/v1?q={Query}&key={api_key}&cx={Searchcx}&num={ResultsSearched}"
 
 FULL_RESULTS = []
 results = []
+start_search_index = 1 # Start index of searches (1)
 
-Links = []
+while start_search_index <= ResultsSearched:
+    # Determine how many results to request in the search (API only allows a max of 10 per search)
+    num_results = min(ResultsSearched - start_search_index + 1, 10)
+    
+    url = f"https://www.googleapis.com/customsearch/v1?q={Query}&key={api_key}&cx={Searchcx}&num={num_results}&start={start_search_index}"
+    response = requests.get(url)
+    print(f"Requesting results {start_search_index}-{start_search_index+num_results-1}, status:", response.status_code)
 
-response = requests.get(url)
-print(response.status_code)
-if response.status_code == 200:
-    data = response.json()
-    # Loop over the search results
-    for item in data.get('items', []):
-        link = item['link']          # URL
-        title = item['title']        # Page title
-        snippet = item['snippet']    # Description of page
+    if response.status_code == 200:
+        data = response.json()
+        for item in data.get('items', []):
+            link = item['link']
+            title = item['title']
+            snippet = item['snippet']
 
-        if not any(f in link for f in Filters):
-            if ".pdf" in link.lower():
-                # Process PDF link
-                pdf_info = process_pdf_link(link)
-                if pdf_info == None: 
-                    continue
-                FULL_RESULTS.append([pdf_info,item])
-                results.append((pdf_info["url"], pdf_info["size"]))  # store as (url, size) pair
-            else:
-                # Non-PDF link -> scrape for PDFs
-                scraped = scrape_pdfs(link)
-                if scraped is None:
-                    continue
-                for pdf in scraped:
-                    FULL_RESULTS.append([pdf,item])
-                    results.append((item["url"], item["size"]))  # store as (url, size) pair
-                    if len(results) > MaxPDFs:  # break inner loop if too many
-                        break
-        if len(results) > MaxPDFs:  # break outer loop if too many
-            break
-else:
-    print("Error:", response.status_code, response.text)
+            if not any(f in link for f in Filters):
+                if ".pdf" in link.lower():
+                    pdf_info = process_pdf_link(link)
+                    if pdf_info is None:
+                        continue
+                    FULL_RESULTS.append([pdf_info, item])
+                    results.append((pdf_info["url"], pdf_info["size"]))
+                else:
+                    scraped = scrape_pdfs(link)
+                    if scraped is None:
+                        continue
+                    for pdf in scraped:
+                        FULL_RESULTS.append([pdf, item])
+                        results.append((pdf["url"], pdf["size"]))
+                        if len(results) >= MaxPDFs:
+                            break
+            if len(results) >= MaxPDFs:
+                break
+    else:
+        print("Error:", response.status_code, response.text)
+    
+    if len(results) >= MaxPDFs:
+        break
+    
+    start_search_index += num_results  # Move to next block of results
 
 
 unique_results = list(set(results))
