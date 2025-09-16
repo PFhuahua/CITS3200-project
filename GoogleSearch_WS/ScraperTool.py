@@ -97,3 +97,33 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         except TimeoutError:
             print("Operation exceeded 50 seconds, returning partial results.")
             return pdf_links  # whatever was collected before timeout
+
+def GetHTML(url: str):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+
+def scrape_Lib(url: str,selector: str):
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)  # headless=True means no window opens
+        page = browser.new_page()
+        page.goto(url)
+        page.wait_for_selector(selector)  # wait for results
+        html = page.content()  # get fully rendered HTML
+        browser.close()
+        return(html)
+
+
+def Find_Lib_Results(html,attrs):
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    # find <h3 class="item-title">, then get <a> inside it
+    links = []
+    for h3 in soup.find_all("h3", class_="item-title"):
+        a = h3.find("a", attrs=attrs)
+        if a and a.has_attr("href"):
+            links.append(a["href"])
+
+    return(links)
