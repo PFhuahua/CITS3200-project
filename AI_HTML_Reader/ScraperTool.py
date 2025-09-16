@@ -17,11 +17,14 @@ model = genai.GenerativeModel(
     model_name="gemini-2.5-pro",
     system_instruction=(
         "You are a website reader."
-        "Given a website's HTML source code, you will read it and produce the website's information such as:"
+        "Given a website's HTML source code, you will read it and return the PDF link that is closest to the given query."
+        "You will be given the html code and a query string."
+        "Using the page descriptions and context for the PDFs, you will find the PDF that best matches the query."
+        "In the cases where there are no PDFs or the PDFs are not relevant, you will return None."
+        "In the cases where there are no PDFs but the page has information matching the query, you will return the following:"
         "- What type of website it is" 
         "- Who runs the website"
         "- Contact information of the owner"
-        "- If there are PDF links, find the PDF links and the description provided for each PDF"
     ),
 )
 
@@ -62,7 +65,7 @@ def process_pdf_link(full_url, get_sizes=True):
         "filetype": content_type
     }
 
-def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 120):
+def scrape_pdfs(url: str, query: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 120):
     pdf_links = []
 
     def _scrape():
@@ -77,7 +80,8 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
             html_content = response.text[:500000]
             #print(len(html_content))
             print(f"Successfully fetched: {url}, sending to AI")
-            AIresponse = model.generate_content(html_content)
+            AI_input = f"HTML:\n{html_content}\n\nQUERY:\n{query}"
+            AIresponse = model.generate_content(AI_input)
             with open("output_sumary.md", "a", encoding="utf-8") as f:
                 f.write(f"\n## For URL: {url}\n")
                 f.write(AIresponse.text+"\n")
