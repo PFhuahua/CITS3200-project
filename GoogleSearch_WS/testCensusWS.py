@@ -78,7 +78,7 @@ unique_results = list(set(results))
 print(f"\n\nPDF RESULTS FOR {Query}:\n")
 for i, url in enumerate(unique_results, start=1):
     if url[1] == None: print(f"{i}. {url[0]} \nfile size: UNKNOWN.\nTitle: {url[2]}, \nsnippet: {url[3]}\n")
-    else: print(f"{i}. {url[0]}, \nfile size: {round(url[1]/1000,0)} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
+    else: print(f"{i}. {url[0]}, \nfile size: {url[1]} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
 print("\n")
 
 end = time.time()
