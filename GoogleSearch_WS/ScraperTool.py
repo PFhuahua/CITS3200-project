@@ -31,7 +31,7 @@ def process_pdf_link(full_url, get_sizes=True):
             
             # File Size
             if 'Content-Length' in head_resp.headers:
-                size = int(head_resp.headers['Content-Length'])
+                size = round(int(head_resp.headers['Content-Length'])/1000,0) #PDF size in KB
         except requests.RequestException:
             size = None
             content_type = None
