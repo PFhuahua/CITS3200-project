@@ -42,7 +42,7 @@ def process_pdf_link(full_url, get_sizes=True):
         "filetype": content_type
     }
 
-def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 100, MaxPDFperPage = 4):
+def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 40, MaxPDFperPage = 4):
     pdf_links = []
 
     def _scrape():
