@@ -104,12 +104,25 @@ def GetHTML(url: str):
         return response.text
 
 def scrape_Lib(url: str,selector: str):
+    # Parse base URL
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # headless=True means no window opens
+        browser = p.chromium.launch(headless=False)  # headless=True means no window opens
         page = browser.new_page()
         page.goto(url)
         page.wait_for_selector(selector)  # wait for results
+        html = page.content()  # get fully rendered HTML
+        browser.close()
+        return(html)
+    
+def scrape_Lib_Vis(url: str,selector: str):
+    # Parse base URL
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # headless=True means no window opens
+        page = browser.new_page()
+        page.goto(url)
+        page.wait_for_selector(selector , state ="visible")  # wait for results
         html = page.content()  # get fully rendered HTML
         browser.close()
         return(html)
