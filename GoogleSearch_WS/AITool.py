@@ -1,11 +1,4 @@
 import google.generativeai as genai
-from dotenv import load_dotenv
-import os
-import requests
-
-load_dotenv()
-# Configure Gemini
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 def generate_search_queries(DocInfo):
     prompt = (
