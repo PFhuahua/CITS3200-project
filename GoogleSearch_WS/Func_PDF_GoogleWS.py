@@ -8,7 +8,7 @@ def PDF_Google_WS(
     Filters: list[str] = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd.",".docx"],
     MaxPDFs: int = 5,
     ResultsSearched: int = 5,
-    api_key: str = "PUT AI HERE",
+    api_key: str = "PUT API HERE",
     Searchcx: str = "f492a293c453341a1"):
 
     """
