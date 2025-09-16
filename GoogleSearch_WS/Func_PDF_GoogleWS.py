@@ -84,7 +84,7 @@ def PDF_Google_WS(
     print(f"\n\nPDF RESULTS FOR {Query}:\n")
     for i, url in enumerate(unique_results, start=1):
         if url[1] == None: print(f"{i}. {url[0]} \nfile size: UNKNOWN.\nTitle: {url[2]}, \nsnippet: {url[3]}\n")
-        else: print(f"{i}. {url[0]}, \nfile size: {round(url[1]/1000,0)} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
+        else: print(f"{i}. {url[0]}, \nfile size: {url[1]} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
     print("\n")
 
     return(unique_results) # PDF URL, PDF size (bytes), PDF Title, PDF Snippet
