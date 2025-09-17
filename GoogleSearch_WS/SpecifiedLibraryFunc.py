@@ -2,7 +2,8 @@ import requests
 from ScraperTool import scrape_Lib,Find_Lib_Results,scrape_Lib_Vis # type: ignore
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import random
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5):
     """
