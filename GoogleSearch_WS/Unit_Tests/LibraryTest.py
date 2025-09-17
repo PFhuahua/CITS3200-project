@@ -3,7 +3,7 @@ from ScraperTool import scrape_Lib,Find_Lib_Results,scrape_Lib_Vis
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import random
-from SpecifiedLibraryCall import scrape_library  # type: ignore
+from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
 libsToCheck = ["France","Texas"]  #France, Texas
 Search = "Census"
