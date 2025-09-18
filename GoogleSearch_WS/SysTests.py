@@ -68,7 +68,7 @@ for l in real_input:
     print(f"Starting search number {count}...")
     iResult = testRunWS(docInfo)
     try:
-        ranked_results = ast.literal_eval(iResult)
+        ranked_results = json.loads(iResult)
     except Exception as e:
         print("Error converting iResult:", e)
         print(str(iResult))
@@ -82,7 +82,7 @@ for l in real_input:
                 file.write(f"{i}. {url[0]} \nfile size: UNKNOWN.\nTitle: {url[2]}, \nsnippet: {url[3]}\n")
             else:
                 file.write(f"{i}. {url[0]}, \nfile size: {round(int(url[1])/1000,0)} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
-    print(f"Results for document: {docInfo.get('Name', 'Unknown')} written to search_results.txt")
+    print(f"Results for document: {l['Name']} written to search_results.txt")
     end = time.time()
     print(f"Process time: {end - start:.4f} seconds")
     count += 1

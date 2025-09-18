@@ -1,5 +1,6 @@
 import google.generativeai as genai
 import time
+import re
 
 def generate_search_queries(DocInfo, max_retries=3, delay=2):
     prompt = (
@@ -17,7 +18,7 @@ def generate_search_queries(DocInfo, max_retries=3, delay=2):
             "You can include pdf in the query but do not force pdf filetype as it restricts the results."
             "After that, depending on colonisation status at the time of the census, use either French, Spanish or Portugese and provide a query in that language too."
             "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."
-            'Return the two queries as a JSON array of strings, e.g. ["Query 1", "Query 2"].'
+            'Return the two queries as a JSON array of strings, e.g. ["Query 1", "Query 2"] IN PLAIN TEXT WITH NO CODE CHUNK.'
         ),
     )
 
@@ -49,7 +50,7 @@ def generate_lib_queries(DocInfo, max_retries=3, delay=2):
             "Not all of the data is necesary for the search, use your best judgement to decide what to include and what to exclude."
             "After that, depending on colonisation status at the time of the census, use either French, Spanish or Portugese and provide a query in that language too."
             "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS"
-            'Return the two queries as a JSON array of strings, e.g. ["Query 1", "Query 2"].'
+            'Return the two queries as a JSON array of strings, e.g. ["Query 1", "Query 2"] IN PLAIN TEXT WITH NO CODE CHUNK.'
         ),
     )
 
@@ -79,14 +80,16 @@ def rank_web_results(Query, ResInfo, max_retries=3, delay=2):
         "The search results will be in the format: (URL, file size in bytes or None if unknown, title, snippet)."
         "Rank the results by how well they match the query."
         "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS"
-        "Return the ranking as a JSON array of arrays, where each array contains [URL, file size, title, snippet]."
+        "Return the ranking as a JSON array of arrays, where each array contains [URL, file size, title, snippet] IN PLAIN TEXT WITH NO CODE CHUNK."
+        "I REPEAT NO BACKTICKS NO CODECHUNKS JUST THE RAW JSON TEXT."
         )
     )
 
     for attempt in range(max_retries):
         try:
             response = model.generate_content(prompt)
-            return response.text.strip()
+            proc_text = response.text.strip().replace('```json', '').replace('`', '')
+            return re.sub(r'\\([^"\\/bfnrtu])', r'\\\\\1', proc_text)
         except Exception as e:
             if "503" in str(e):
                 print(f"503 Service Unavailable. Retrying in {delay} seconds... (Attempt {attempt+1}/{max_retries})")

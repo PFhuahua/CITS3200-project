@@ -86,6 +86,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
             pdf_info = process_pdf_link(full_url, get_sizes=get_sizes)
             if pdf_info != None:
                 pdf_links.append(pdf_info)
+                print("PDF added")
 
         return pdf_links
 
