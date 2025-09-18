@@ -1,0 +1,2 @@
+pydantic>=2.0.0
+pycountry>=22.0.0
