@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 census.db
 .env
+mysql_data/
