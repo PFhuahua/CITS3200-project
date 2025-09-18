@@ -15,7 +15,7 @@ headers = {
 
 def process_pdf_link(full_url, get_sizes=True):
     """Process a single PDF URL to extract filename and optionally size."""
-    print(f"Processing {full_url}")
+    #print(f"Processing {full_url}")
     filename = os.path.basename(full_url)
     size = None
     content_type = None
@@ -52,7 +52,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
 
         # Get HTML content
         try:
-            print(f"fetching: {url}")
+            #print(f"fetching: {url}")
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
 
@@ -68,9 +68,9 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
                 )
                 if len(pdf_refs) > MaxPDFperPage: break
             #print(len(html_content))
-            print(f"Successfully fetched: {url}, PDFs Found: {len(pdf_refs)}")
+            #print(f"Successfully fetched: {url}, PDFs Found: {len(pdf_refs)}")
         except requests.exceptions.RequestException as e:
-            print(f"Skipped {url} due to request error: {e}")
+            #print(f"Skipped {url} due to request error: {e}")
             return pdf_links
 
         # Apply filter if given
@@ -95,7 +95,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         try:
             return future.result(timeout=max_time)
         except TimeoutError:
-            print("Operation exceeded 50 seconds, returning partial results.")
+            print("Operation exceeded 40 seconds, returning partial results.")
             return pdf_links  # whatever was collected before timeout
 
 def GetHTML(url: str):
