@@ -18,9 +18,6 @@ def generate_search_queries(DocInfo, max_retries=3, delay=2):
             "After that, depending on colonisation status at the time of the census, use either French, Spanish or Portugese and provide a query in that language too."
             "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."
             'Return the two queries as a JSON array of strings, e.g. ["Query 1", "Query 2"].'
-            "DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."
-            "DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."
-            "DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."
         ),
     )
 

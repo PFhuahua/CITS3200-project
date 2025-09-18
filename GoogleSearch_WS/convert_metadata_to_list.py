@@ -6,9 +6,9 @@ from xml.etree import ElementTree as ET
 
 NA_RE = re.compile(r'^(?:N/?A|NA|NaN|null|None)$', re.IGNORECASE)
 HEADER_KEYS = {
-    'name', 'file name origin', 'title', 'original title', 'country', 'province',
+    'name', 'title (in english)', 'original title', 'country', 'province',
     'date', 'year', 'publication', 'author', 'publisher',
-    'volume', 'file size', 'pages', 'table'
+    'volume', 'file size', 'pages', 'colonising'
 }
 
 
@@ -44,7 +44,7 @@ def apply_header(df_raw, hdr_row, keep_na):
 
 def read_csv(path, max_rows, keep_na, hdr_row, hdr_depth):
     pd = get_pd()
-    df = pd.read_csv(path, header=None, dtype=str, na_filter=False)
+    df = pd.read_csv(path, header=None, dtype=str, na_filter=False, encoding="latin1")
     if hdr_row is None: hdr_row = guess_header(df, hdr_depth, keep_na)
     data = apply_header(df, hdr_row, keep_na)
     if max_rows: data = data.head(max_rows)
