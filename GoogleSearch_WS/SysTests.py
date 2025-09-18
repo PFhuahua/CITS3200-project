@@ -74,18 +74,19 @@ for l in real_input:
         print(str(iResult))
         continue
     #print(iResult)
+    end = time.time()
+    all_time.append(end - start)
+    print(f"Process time: {end - start:.4f} seconds")
     with open("search_results.txt", "a", encoding="utf-8") as file:
         file.write(f"\nResults for document: {l['Name']}")
-        file.write(f"\nResults for document: {l['Title (In English)']}\n\n")
-        for i, url in enumerate(ranked_results, start=1):
+        file.write(f"\nResults for document: {l['Title (In English)']}")
+        file.write(f"\nTime taken: {end - start:.4f}\n\n")
+        for i, url in enumerate(ranked_results[:3], start=1):
             if url[1] == None:
                 file.write(f"{i}. {url[0]} \nfile size: UNKNOWN.\nTitle: {url[2]}, \nsnippet: {url[3]}\n")
             else:
                 file.write(f"{i}. {url[0]}, \nfile size: {round(int(url[1])/1000,0)} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
     print(f"Results for document: {l['Name']} written to search_results.txt")
-    end = time.time()
-    all_time.append(end - start)
-    print(f"Process time: {end - start:.4f} seconds")
     count += 1
     '''d = input("\nPress l if you want to search library instead, any other key to continue: ")
     if d.lower() == "l":
