@@ -6,7 +6,6 @@ import google.generativeai as genai
 import os
 import time
 import json
-import ast
 
 load_dotenv()
 GOOGLE_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -62,6 +61,7 @@ with open("search_results.txt", "w", encoding="utf-8") as file:
 # Nested list from batching program
 real_input = convert_file("test_data.csv")
 count = 1
+all_time = []
 for l in real_input:
     docInfo = ", ".join(f"{key}: {value}" for key, value in l.items())
     start = time.time()
@@ -84,8 +84,10 @@ for l in real_input:
                 file.write(f"{i}. {url[0]}, \nfile size: {round(int(url[1])/1000,0)} KB.\n Title: {url[2]}, \nsnippet: {url[3]}\n")
     print(f"Results for document: {l['Name']} written to search_results.txt")
     end = time.time()
+    all_time.append(end - start)
     print(f"Process time: {end - start:.4f} seconds")
     count += 1
     '''d = input("\nPress l if you want to search library instead, any other key to continue: ")
     if d.lower() == "l":
         print("Not implemented yet")'''
+print(f"\nAverage time per document: {sum(all_time)/len(all_time):.4f} seconds")
