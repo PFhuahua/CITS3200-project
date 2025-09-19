@@ -42,7 +42,7 @@ def process_pdf_link(full_url, get_sizes=True):
         "filetype": content_type
     }
 
-def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 40, MaxPDFperPage = 4):
+def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_time: int = 30, MaxPDFperPage = 4):
     pdf_links = []
 
     def _scrape():
@@ -96,7 +96,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         try:
             return future.result(timeout=max_time)
         except TimeoutError:
-            print("Operation exceeded 40 seconds, returning partial results.")
+            print("Operation exceeded 30 seconds, returning partial results.")
             return pdf_links  # whatever was collected before timeout
 
 def GetHTML(url: str):
