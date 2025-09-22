@@ -10,8 +10,8 @@ import datetime
 class Source(Base):
     __tablename__ = "sources"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(191), nullable=False)          # 加长度
-    type = Column(String(50), nullable=False)           # gov_site/lib/api
+    name = Column(String(191), nullable=False)          
+    type = Column(String(50), nullable=False)         
     homepage_url = Column(Text)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     documents = relationship("Document", back_populates="source")
@@ -22,19 +22,18 @@ class Document(Base):
     __tablename__ = "documents"
     id = Column(Integer, primary_key=True, autoincrement=True)
     source_id = Column(Integer, ForeignKey("sources.id"))
-    external_id = Column(String(191))                   # 给长度
+    external_id = Column(String(191))                   
     title = Column(Text, nullable=False)
     url = Column(Text, nullable=False)
     published_at = Column(Date)
     fetched_at = Column(DateTime, default=datetime.datetime.utcnow)
-    content_hash = Column(String(64))                   # 已有长度
+    content_hash = Column(String(64))                   
     raw_metadata = Column(JSON)
-    lang = Column(String(8))                            # 原来 (2)，稍微放宽
+    lang = Column(String(8))                            
     country_iso3 = Column(String(3))
-    region_code = Column(String(50))                    # 原来无长度
-    topic = Column(String(100))                         # 原来无长度
-    status = Column(String(50), default="active")       # 原来无长度
-
+    region_code = Column(String(50))                    
+    topic = Column(String(100))                         
+    status = Column(String(50), default="active")       
     source = relationship("Source", back_populates="documents")
 
 
@@ -46,8 +45,7 @@ class Search(Base):
     params = Column(JSON)
     started_at = Column(DateTime, default=datetime.datetime.utcnow)
     finished_at = Column(DateTime)
-    status = Column(String(50), default="queued")       # queued/running/done/failed
-
+    status = Column(String(50), default="queued")      
     results = relationship("SearchResult", back_populates="search")
 
 
@@ -64,15 +62,14 @@ class SearchResult(Base):
     search = relationship("Search", back_populates="results")
     document = relationship("Document")
 
-
 # Batches
 class Batch(Base):
     __tablename__ = "batches"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(191), nullable=False)          # 原来 Text，改短一点方便索引
-    created_by = Column(String(100))                    # 原来无长度
+    name = Column(String(191), nullable=False)         
+    created_by = Column(String(100))                
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    status = Column(String(50), default="created")      # created/running/done/failed
+    status = Column(String(50), default="created")     
     summary = Column(JSON)
 
     queries = relationship("BatchQuery", back_populates="batch")
@@ -97,8 +94,8 @@ class Country(Base):
     iso2 = Column(String(2), primary_key=True)
     iso3 = Column(String(3), unique=True, nullable=False)
     m49 = Column(Integer, unique=True)
-    name_en = Column(String(191), nullable=False)       # 原来 Text
-    name_local = Column(String(191))                    # 原来 Text
+    name_en = Column(String(191), nullable=False)       
+    name_local = Column(String(191))   
 
 
 # Regions
@@ -106,17 +103,39 @@ class Region(Base):
     __tablename__ = "regions"
     id = Column(Integer, primary_key=True, autoincrement=True)
     country_iso3 = Column(String(3), ForeignKey("countries.iso3"))
-    code = Column(String(50), nullable=False)           # 原来无长度
-    name = Column(String(191), nullable=False)          # 原来 Text
+    code = Column(String(50), nullable=False)           
+    name = Column(String(191), nullable=False)   
 
 
 # Audits
 class Audit(Base):
     __tablename__ = "audits"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    table_name = Column(String(100), nullable=False)    # 原来 Text
-    action = Column(String(50), nullable=False)         # insert/update/delete
+    table_name = Column(String(100), nullable=False)    
+    action = Column(String(50), nullable=False)         
     before = Column(JSON)
     after = Column(JSON)
-    actor = Column(String(100))                         # 原来 Text
+    actor = Column(String(100))                         
     at = Column(DateTime, default=datetime.datetime.utcnow)
+class Library(Base):
+    __tablename__ = "libraries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(191), nullable=False)     
+    url_start = Column(String(500), nullable=False)   
+    url_end = Column(String(500))                       
+    search_selector = Column(String(200), nullable=False)
+    attribute = Column(JSON)                        
+    tag = Column(String(50))
+    tag_class = Column(String(100))
+    result_selector = Column(String(200))
+    visible = Column(Boolean, default=True)
+    priority = Column(Integer, default=1)
+    country = Column(String(100))
+    captcha = Column(Boolean, default=False)   
+
+class FilterLink(Base):
+    __tablename__ = "filter_links"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    link = Column(String(500), nullable=False) 
