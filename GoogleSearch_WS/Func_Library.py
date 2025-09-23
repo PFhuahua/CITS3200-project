@@ -223,5 +223,5 @@ def Find_Lib_Results(Query):
 
 
     end = time.time()
-    print(f"Elapsed time: {end - start:.4f} seconds")
+    #print(f"Elapsed time: {end - start:.4f} seconds")
     return(results)
