@@ -5,9 +5,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
-libsToCheck = [" "] 
+#Priority ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","United States","National Archives"] 
+
+libsToCheck = ["Albania"]
 Search = "Census"
-ResultsPerLib = 1
+ResultsPerLib = 2
 
 api_key = "API" #API KEY
 Searchcx = "97c19d00f487341b6"
@@ -170,6 +172,19 @@ Library = {
         "Result_URL_Start": "",
         "Visible": True,
         "CAPTCHA": False
+    },#END OF PRIORITY NOW IN ALPHABETICAL https://www.flagpictures.com/countries/national-libraries/?utm_source=chatgpt.com%5C
+    "Albania":{
+        "Name": "National Library of Albania",
+        "URL_Start": "https://www.bksh.al/search/",
+        "URL_End": "",
+        "SearchSelector": "div.record-image",
+        "Attribute": {},
+        "tag": "div",
+        "tag_class": "katalogu-materiale",
+        "ResultSelector": "h2.text-primary",
+        "Result_URL_Start": "https://www.bksh.al",
+        "Visible": True,
+        "CAPTCHA": False
     }
 }
 
@@ -179,7 +194,7 @@ for libs in Library: print(Library[libs]["Name"])
 
 start = time.time()
 
-with ThreadPoolExecutor(max_workers=2) as executor:
+with ThreadPoolExecutor(max_workers=8) as executor:
     futures = {
         executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
         for lib in libsToCheck
@@ -197,4 +212,3 @@ with ThreadPoolExecutor(max_workers=2) as executor:
 
 
 end = time.time()
-print(f"Elapsed time: {end - start:.4f} seconds")
