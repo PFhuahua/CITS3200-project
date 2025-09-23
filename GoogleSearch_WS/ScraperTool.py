@@ -116,9 +116,9 @@ def scrape_Lib(url: str,selector: str):
         page = browser.new_page()
         page.goto(url)
         try:
-            page.wait_for_selector(selector,timeout=10000)  # wait for results, timeout 7sec
+            page.wait_for_selector(selector,timeout=40000)  # wait for results, timeout 7sec
         except:
-            return None
+            html = page.content()
         html = page.content()  # get fully rendered HTML
         browser.close()
         return(html)
@@ -131,9 +131,9 @@ def scrape_Lib_Vis(url: str,selector: str):
         page = browser.new_page()
         page.goto(url)
         try:
-            page.wait_for_selector(selector , state ="visible",timeout=10000)  # wait for results, timeout 7sec
+            page.wait_for_selector(selector , state ="visible",timeout=40000)  # wait for results, timeout 7sec
         except:
-            return None
+            html = page.content()
         html = page.content()  # get fully rendered HTML
         browser.close()
         return(html)

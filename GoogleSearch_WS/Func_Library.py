@@ -6,12 +6,9 @@ import re
 from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
 def Find_Lib_Results(Query):
-    libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London"] 
+    libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","London"] #,"Canada"
     ResultsPerLib = 1
     Search = Query
-
-    api_key = "API" #API KEY
-    Searchcx = "97c19d00f487341b6"
 
 
 
@@ -206,7 +203,9 @@ def Find_Lib_Results(Query):
                 results[lib_name] = future.result()
             except Exception as e:
                 print(f"{lib_name} failed: {e}")
-        print(results)
+        for key, value in results.items():
+            for v in value:
+                print(key, v[0])
 
 
 

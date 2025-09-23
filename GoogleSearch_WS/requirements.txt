@@ -2,6 +2,6 @@ google-generativeai
 python-dotenv
 requests
 beautifulsoup4
-playwright
+playwright[browsers]
 pandas
 openpyxl

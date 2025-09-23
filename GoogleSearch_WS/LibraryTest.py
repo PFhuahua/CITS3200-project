@@ -7,13 +7,9 @@ from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
 #Priority ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","United States","National Archives"] 
 
-libsToCheck = ["Albania"]
-Search = "Census"
+libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","United States","National Archives"]
+Search = "SEGUNDO CENSO DE LA REPUBLICA ARGENTINA"
 ResultsPerLib = 2
-
-api_key = "API" #API KEY
-Searchcx = "97c19d00f487341b6"
-
 
 
 Library = {
@@ -194,7 +190,7 @@ for libs in Library: print(Library[libs]["Name"])
 
 start = time.time()
 
-with ThreadPoolExecutor(max_workers=8) as executor:
+with ThreadPoolExecutor(max_workers=3) as executor:
     futures = {
         executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
         for lib in libsToCheck
