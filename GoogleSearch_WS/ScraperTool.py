@@ -3,6 +3,9 @@ import requests
 from urllib.parse import urlparse, urljoin
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -112,7 +115,7 @@ def scrape_Lib(url: str,selector: str):
         page = browser.new_page()
         page.goto(url)
         try:
-            page.wait_for_selector(selector,timeout=7000)  # wait for results, timeout 7sec
+            page.wait_for_selector(selector,timeout=10000)  # wait for results, timeout 7sec
         except:
             return None
         html = page.content()  # get fully rendered HTML
@@ -127,7 +130,7 @@ def scrape_Lib_Vis(url: str,selector: str):
         page = browser.new_page()
         page.goto(url)
         try:
-            page.wait_for_selector(selector , state ="visible",timeout=7000)  # wait for results, timeout 7sec
+            page.wait_for_selector(selector , state ="visible",timeout=10000)  # wait for results, timeout 7sec
         except:
             return None
         html = page.content()  # get fully rendered HTML
@@ -142,9 +145,12 @@ def Find_Lib_Results(html,attrs,tag,tag_class):
     # find <h3 class="item-title">, then get <a> inside it
     links = []
     for div in soup.find_all(tag, class_=tag_class):
+        #print(div)
         a_tags = div.find_all("a", attrs=attrs)  # find ALL matches, not just on
+        #print(a_tags)
         for a in a_tags:
             if a.has_attr("href"):
                 links.append(a["href"])
-
+    
+    #print(links)
     return(links)
