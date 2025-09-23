@@ -6,7 +6,7 @@ import re
 from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
 def Find_Lib_Results(Query):
-    libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","London"] #,"Canada"
+    libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","National Archives","South Africa"]
     ResultsPerLib = 1
     Search = Query
 
@@ -118,14 +118,14 @@ def Find_Lib_Results(Query):
             "CAPTCHA": False
         },
         "Canada":{
-            "Name": "Library and Archives Canada",
-            "URL_Start": "https://www.canada.ca/en/sr/srb.html#q=",
-            "URL_End": "",
-            "SearchSelector": "div.results",
-            "Attribute": {"class":"result-link"},
+            "Name": "Canada Government Collection",
+            "URL_Start": "https://recherche-collection-search.bac-lac.gc.ca/eng/Home/Result?q_type_1=q&q_1=",
+            "URL_End": "&SEARCH_TYPE=SEARCH_BASIC&",
+            "SearchSelector": "img.lazyloaded",
+            "Attribute": {"onclick":"SaveTopScrollPosition()"},
             "tag": "div",
-            "tag_class": "results",
-            "ResultSelector": 'div.mwsgeneric-base-html',
+            "tag_class": "CFCS-width-all",
+            "ResultSelector": 'div.ucc-container',
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
@@ -168,6 +168,19 @@ def Find_Lib_Results(Query):
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "South Africa":{
+            "Name": "National Library of South Africa (NLSA)",
+            "URL_Start": "https://cdm21048.contentdm.oclc.org/digital/search/searchterm/",
+            "URL_End": "",
+            "SearchSelector": "img.SearchResult-thumbnail",
+            "Attribute": {"tabindex": "0"},
+            "tag": "div",
+            "tag_class": "Search-mainContent",
+            "ResultSelector": "div.ItemPDF-itemImage",
+            "Result_URL_Start": "https://cdm21048.contentdm.oclc.org",
+            "Visible": True,
+            "CAPTCHA": False
         },#END OF PRIORITY NOW IN ALPHABETICAL https://www.flagpictures.com/countries/national-libraries/?utm_source=chatgpt.com%5C
         "Albania":{
             "Name": "National Library of Albania",
@@ -190,7 +203,7 @@ def Find_Lib_Results(Query):
 
     start = time.time()
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=9) as executor:
         futures = {
             executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
             for lib in libsToCheck

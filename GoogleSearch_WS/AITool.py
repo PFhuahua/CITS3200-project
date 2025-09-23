@@ -47,10 +47,10 @@ def generate_lib_queries(DocInfo, max_retries=3, delay=2):
             "The context is that a user is searching for census data from some given country and year in an internal library search."
             "You will be provided some of the folowing: the name of the document, the country, the province, the year of the census, year of publication, publisher, volume number and more."
             "With these info, you will generate a search query that will be best fit for finding a match in big libraries."
-            "Prioritise the full title and year for the best results. These 2 fields must be in the query for it to have any chance of finding the correct thing."
-            "Do not use double quotes for perfect matches, they're not needed for libs."
+            "Prioritise the full title and year for the best results. These 2 fields must be in the query for it to have any chance of finding the correct thing UNLESS the title includes the year already."
             "Use common sense to decide whether or not to add extra fields. Eg. if there is already a year in the title then don't make it confusing by adding another year."
-            "Be concise too, unless the title is too ambiguous the less you add the better."
+            "Do not use double quotes for perfect matches, they're not needed for libs."
+            "Be as concise as you can, unless the title is very generic do not add any other fields to the query. In fact you will want to remove the tome/volume if they're included in the query."
             "After that, depending on colonisation status at the time of the census, use either French, Spanish or Portugese and provide a query with the same restrictions in that language too."
             "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS"
             'Return the two queries as a JSON array of strings, e.g. ["Query 1", "Query 2"] IN PLAIN TEXT WITH NO CODE CHUNK.'
