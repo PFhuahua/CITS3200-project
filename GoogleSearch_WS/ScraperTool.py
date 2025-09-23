@@ -3,6 +3,9 @@ import requests
 from urllib.parse import urlparse, urljoin
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -99,32 +102,56 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
             print("Operation exceeded 30 seconds, returning partial results.")
             return pdf_links  # whatever was collected before timeout
 
+
 def GetHTML(url: str):
     response = requests.get(url)
     if response.status_code == 200:
         return response.text
 
 def scrape_Lib(url: str,selector: str):
+    # Parse base URL
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # headless=True means no window opens
+        browser = p.chromium.launch(headless=False)  # headless=True means no window opens
         page = browser.new_page()
         page.goto(url)
-        page.wait_for_selector(selector)  # wait for results
+        try:
+            page.wait_for_selector(selector,timeout=10000)  # wait for results, timeout 7sec
+        except:
+            return None
+        html = page.content()  # get fully rendered HTML
+        browser.close()
+        return(html)
+    
+def scrape_Lib_Vis(url: str,selector: str):
+    # Parse base URL
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # headless=True means no window opens
+        page = browser.new_page()
+        page.goto(url)
+        try:
+            page.wait_for_selector(selector , state ="visible",timeout=10000)  # wait for results, timeout 7sec
+        except:
+            return None
         html = page.content()  # get fully rendered HTML
         browser.close()
         return(html)
 
 
-def Find_Lib_Results(html,attrs):
+def Find_Lib_Results(html,attrs,tag,tag_class):
 
     soup = BeautifulSoup(html, "html.parser")
 
     # find <h3 class="item-title">, then get <a> inside it
     links = []
-    for h3 in soup.find_all("h3", class_="item-title"):
-        a = h3.find("a", attrs=attrs)
-        if a and a.has_attr("href"):
-            links.append(a["href"])
-
+    for div in soup.find_all(tag, class_=tag_class):
+        #print(div)
+        a_tags = div.find_all("a", attrs=attrs)  # find ALL matches, not just on
+        #print(a_tags)
+        for a in a_tags:
+            if a.has_attr("href"):
+                links.append(a["href"])
+    
+    #print(links)
     return(links)
