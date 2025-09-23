@@ -198,7 +198,7 @@ def Find_Lib_Results(Query):
     }
 
 
-    for libs in Library: print(Library[libs]["Name"])
+    #for libs in Library: print(Library[libs]["Name"])
     #for libs in Library: print(Library[libs]["Attribute"])
 
     start = time.time()
