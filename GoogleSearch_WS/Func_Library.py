@@ -182,6 +182,19 @@ def Find_Lib_Results(Query):
             "Visible": True,
             "CAPTCHA": False
         },#END OF PRIORITY NOW IN ALPHABETICAL https://www.flagpictures.com/countries/national-libraries/?utm_source=chatgpt.com%5C
+        "Afghanistan":{
+            "Name":"Afghanistan Center at Kabul University",
+            "URL_Start": "https://archive.af/cgi-bin/koha/opac-search.pl?q=",
+            "URL_End": "",
+            "SearchSelector": "div.title_summary",
+            "Attribute": {"class": "title"},
+            "tag": "div",
+            "tag_class": "title_summary",
+            "ResultSelector": "td.itype",
+            "Result_URL_Start": "https://archive.af",
+            "Visible": True,
+            "CAPTCHA": False
+        },
         "Albania":{
             "Name": "National Library of Albania",
             "URL_Start": "https://www.bksh.al/search/",
