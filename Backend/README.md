@@ -25,6 +25,17 @@ This is the FastAPI backend for the Census PDF Finder application. It provides A
    - Health Check: `http://localhost:8000/api/health`
 
 ## API Endpoints
+### Libraries API
+- POST `/api/libraries/`
+- GET `/api/libraries/`
+- PUT `/api/libraries/{id}` 
+- DELETE `/api/libraries/{id}` 
+
+### Filters API
+- POST `/api/filters/` 
+- GET `/api/filters/` 
+- PUT `/api/filters/{id}` 
+- DELETE `/api/filters/{id}` 
 
 ### Search Census Documents
 ```
@@ -140,3 +151,11 @@ The API returns proper HTTP status codes and error messages:
 - `500` - Internal Server Error (search/download failed)
 
 Error responses include a `detail` field with the error message.
+
+##Run FastAPI + MySQL with Docker
+docker compose up -d --build ##Start services
+docker compose ps ##Check status
+
+docker compose exec backend python -m backend.db.create_db  ##Create database tables
+
+access api: http://localhost:8000/docs

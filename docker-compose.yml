@@ -12,3 +12,15 @@ services:
       - "3307:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
+  backend:
+    build: ./backend
+    container_name: backend
+    command: uvicorn backend.api:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:3200@db:3306/project
+    depends_on:
+      - db
