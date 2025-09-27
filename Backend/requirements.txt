@@ -5,3 +5,6 @@ requests
 google
 python-dotenv
 googlesearch-python
+sqlalchemy
+pymysql
+cryptography

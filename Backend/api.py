@@ -1,6 +1,10 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from backend.db.db import SessionLocal
+from backend.db import models
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import asyncio
@@ -23,7 +27,13 @@ app = FastAPI(
     description="API for searching and downloading census PDFs",
     version="1.0.0"
 )
-
+# Dependency to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -139,6 +149,110 @@ async def health_check():
         "timestamp": datetime.now().isoformat(),
         "version": "1.0.0"
     }
+
+# Libraries
+class LibraryBase(BaseModel):
+    name: str
+    url_start: str
+    url_end: str | None = None
+    search_selector: str
+    attribute: dict
+    tag: str
+    tag_class: str
+    result_selector: str
+    visible: bool = True
+    priority: int = 1
+    country: str
+    captcha: bool = False
+
+class LibraryCreate(LibraryBase):
+    pass
+
+class LibraryUpdate(BaseModel):
+    name: str | None = None
+    url_start: str | None = None
+    url_end: str | None = None
+    search_selector: str | None = None
+    attribute: dict | None = None
+    tag: str | None = None
+    tag_class: str | None = None
+    result_selector: str | None = None
+    visible: bool | None = None
+    priority: int | None = None
+    country: str | None = None
+    captcha: bool | None = None
+
+@app.post("/api/libraries/")
+def create_library(library: LibraryCreate, db: Session = Depends(get_db)):
+    db_lib = models.Library(**library.dict())
+    db.add(db_lib)
+    db.commit()
+    db.refresh(db_lib)
+    return db_lib
+
+@app.get("/api/libraries/")
+def list_libraries(db: Session = Depends(get_db)):
+    return db.query(models.Library).order_by(models.Library.priority.desc()).all()
+
+@app.put("/api/libraries/{lib_id}")
+def update_library(lib_id: int, library: LibraryUpdate, db: Session = Depends(get_db)):
+    db_lib = db.query(models.Library).filter(models.Library.id == lib_id).first()
+    if not db_lib:
+        raise HTTPException(status_code=404, detail="Library not found")
+    for key, value in library.dict(exclude_unset=True).items():
+        setattr(db_lib, key, value)
+    db.commit()
+    db.refresh(db_lib)
+    return db_lib
+
+@app.delete("/api/libraries/{lib_id}")
+def delete_library(lib_id: int, db: Session = Depends(get_db)):
+    db_lib = db.query(models.Library).filter(models.Library.id == lib_id).first()
+    if not db_lib:
+        raise HTTPException(status_code=404, detail="Library not found")
+    db.delete(db_lib)
+    db.commit()
+    return {"message": f"Library {lib_id} deleted successfully"}
+
+
+# FilterLinks
+class FilterLinkCreate(BaseModel):
+    link: str
+
+class FilterLinkUpdate(BaseModel):
+    link: str | None = None
+
+@app.post("/api/filters/")
+def create_filter(filter_link: FilterLinkCreate, db: Session = Depends(get_db)):
+    db_filter = models.FilterLink(**filter_link.dict())
+    db.add(db_filter)
+    db.commit()
+    db.refresh(db_filter)
+    return db_filter
+
+@app.get("/api/filters/")
+def list_filters(db: Session = Depends(get_db)):
+    return db.query(models.FilterLink).all()
+
+@app.put("/api/filters/{filter_id}")
+def update_filter(filter_id: int, filter_link: FilterLinkUpdate, db: Session = Depends(get_db)):
+    db_filter = db.query(models.FilterLink).filter(models.FilterLink.id == filter_id).first()
+    if not db_filter:
+        raise HTTPException(status_code=404, detail="Filter not found")
+    for key, value in filter_link.dict(exclude_unset=True).items():
+        setattr(db_filter, key, value)
+    db.commit()
+    db.refresh(db_filter)
+    return db_filter
+
+@app.delete("/api/filters/{filter_id}")
+def delete_filter(filter_id: int, db: Session = Depends(get_db)):
+    db_filter = db.query(models.FilterLink).filter(models.FilterLink.id == filter_id).first()
+    if not db_filter:
+        raise HTTPException(status_code=404, detail="Filter not found")
+    db.delete(db_filter)
+    db.commit()
+    return {"message": f"Filter {filter_id} deleted successfully"}
 
 @app.post("/api/search", response_model=SearchResponse)
 async def search_census_documents(request: SearchRequest):

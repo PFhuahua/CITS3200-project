@@ -4,7 +4,7 @@ Startup script for the Census PDF Finder API
 """
 
 import uvicorn
-from api import app
+from backend.api  import app
 
 if __name__ == "__main__":
     print("Starting Census PDF Finder API...")
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     print("Press Ctrl+C to stop the server")
     
     uvicorn.run(
-        "api:app",  # Import string format to avoid warning
+        "backend.api:app",  # Import string format to avoid warning
         host="0.0.0.0",
         port=8000,
         reload=True,  # Auto-reload on code changes
