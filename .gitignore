@@ -60,3 +60,5 @@ htmlcov/
 .cursor/
 
 .cursor
+
+mysql_data/
