@@ -164,7 +164,7 @@ def Find_Lib_Results(Query):
             "Attribute": {"class": "result-title-link"},
             "tag": "div",
             "tag_class": "search-result-item-wrapper",
-            "ResultSelector": "div.col-sm-9",
+            "ResultSelector": "body.html",
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
