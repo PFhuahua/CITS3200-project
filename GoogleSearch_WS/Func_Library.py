@@ -238,3 +238,49 @@ def Find_Lib_Results(Query):
     end = time.time()
     #print(f"Elapsed time: {end - start:.4f} seconds")
     return(results)
+
+
+def Find_Bur_Results(Query):
+    libsToCheck = ["France"] 
+    ResultsPerLib = 1
+    Search = Query
+
+    #https://unstats.un.org/home/nso_sites/ France
+    Library = {
+        "France":{
+            "Name": "France National Institute of Statistics and Economic Studies",
+            "URL_Start": "https://www.insee.fr/fr/recherche?idprec=8226711&q=",
+            "URL_End": "&debut=0",
+            "SearchSelector": "div.echo-chapo",
+            "Attribute": {"class": "echo-lien"},
+            "tag": "tr",
+            "tag_class": "cliquable",
+            "ResultSelector": "span.hidden-template-impression",
+            "Result_URL_Start": "https://www.insee.fr",
+            "Visible": True,
+            "CAPTCHA": False
+        }
+    }
+
+    start = time.time()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = {
+            executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
+            for lib in libsToCheck
+        }
+
+        results = {}
+        for future in as_completed(futures):
+            lib_name = futures[future]
+            try:
+                results[lib_name] = future.result()
+            except Exception as e:
+                print(f"{lib_name} failed: {e}")
+        print(results)
+
+
+
+    end = time.time()
+    #print(f"Elapsed time: {end - start:.4f} seconds")
+    return(results)
