@@ -305,6 +305,19 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             "Result_URL_Start": "https://www.insee.fr",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "South Africa":{
+            "Name": "Statistics South Africa",
+            "URL_Start": "https://www.statssa.gov.za/?s=",
+            "URL_End": "&sitem=publications",
+            "SearchSelector": "div.tab-pane",
+            "Attribute": {"class": "btn"},
+            "tag": "div",
+            "tag_class": "tab-pane",
+            "ResultSelector": "div.well",
+            "Result_URL_Start": " ",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
