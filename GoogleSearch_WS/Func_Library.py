@@ -323,7 +323,9 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
                 results[lib_name] = future.result()
             except Exception as e:
                 print(f"{lib_name} failed: {e}")
-        print(results)
+        for key, value in results.items():
+            for v in value:
+                print(key, v[0])
 
 
 
