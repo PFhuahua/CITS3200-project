@@ -435,6 +435,45 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             "Result_URL_Start": "https://en.www.inegi.org.mx",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Sweden":{
+            "Name": "Statistics Sweden",
+            "URL_Start": "https://www.scb.se/en/finding-statistics/search/?query=census&Category=Publications&Date=Anytime&Q=",
+            "URL_End": "&Page=1",
+            "SearchSelector": "h4.title",
+            "Attribute": {},
+            "tag": "li",
+            "tag_class": "article",
+            "ResultSelector": "div.row",
+            "Result_URL_Start": "https://www.scb.se",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Canada":{
+            "Name": "Statistics Canada",
+            "URL_Start": "https://www.statcan.gc.ca/search/results/site-search?q=",
+            "URL_End": "&op=&fq=stclac:2",
+            "SearchSelector": "span.results_description",
+            "Attribute": {"ng-click":"openurl(url);"},
+            "tag": "li",
+            "tag_class": "mrgn-bttm-md",
+            "ResultSelector": "div.mrgn-tp-md",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Global":{
+            "Name": "globalEDGE",
+            "URL_Start": "https://globaledge.msu.edu/search?q=census#gsc.tab=0&gsc.q=",
+            "URL_End": "&gsc.page=1",
+            "SearchSelector": "div.gs-title",
+            "Attribute": {"target":"_parent"},
+            "tag": "div",
+            "tag_class": "gs-title",
+            "ResultSelector": "div.mdl-card__supporting-text",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
