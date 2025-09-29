@@ -5,11 +5,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
-def Find_Lib_Results(Query):
-    libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","National Archives","South Africa"]
-    ResultsPerLib = 1
+def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 6):
+    libsToCheck = ["Texas","France","Spain","Britian","Germany","Netherlands","Portugal","Canada","London","United States","National Archives","South Africa"] 
+    ResultsPerLib = NumResults
     Search = Query
 
+    # Merge List of always search libs and specified libs 
+    if (SpecifiedLibs != None):  libsToCheck = list(set(libsToCheck + SpecifiedLibs))
 
 
     Library = {
@@ -216,7 +218,7 @@ def Find_Lib_Results(Query):
 
     start = time.time()
 
-    with ThreadPoolExecutor(max_workers=9) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
             for lib in libsToCheck
@@ -240,9 +242,9 @@ def Find_Lib_Results(Query):
     return(results)
 
 
-def Find_Bur_Results(Query):
+def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 6):
     libsToCheck = ["France"] 
-    ResultsPerLib = 1
+    ResultsPerLib = NumResults
     Search = Query
 
     #https://unstats.un.org/home/nso_sites/ France
@@ -264,7 +266,7 @@ def Find_Bur_Results(Query):
 
     start = time.time()
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
             for lib in libsToCheck
