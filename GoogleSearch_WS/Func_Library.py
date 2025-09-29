@@ -370,6 +370,71 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             "Result_URL_Start": "https://www.destatis.de/",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Netherlands":{ 
+            "Name": "Statistics Netherlands (CBS)",
+            "URL_Start": "https://www.cbs.nl/en-gb/search?q=",
+            "URL_End": "&selectedtypes=publications&selectedperiod=all-periods&startdate=&enddate=&sortorder=0",
+            "SearchSelector": "h3.d-lg-block",
+            "Attribute": {},
+            "tag": "div",
+            "tag_class": "col-lg-10",
+            "ResultSelector": "img.img-fluid",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Belgium":{ 
+            "Name": "Statbel the Belgian statistical office",
+            "URL_Start": "https://statbel.fgov.be/en/search?search_api_fulltext_block=",
+            "URL_End": "&items_per_page=10",
+            "SearchSelector": "div.field",
+            "Attribute": {"class":"more-link"},
+            "tag": "div",
+            "tag_class": "views-row",
+            "ResultSelector": "h1.page-header",
+            "Result_URL_Start": "https://statbel.fgov.be",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "China":{ 
+            "Name": "National Bureau of Statistics of China",
+            "URL_Start": "https://www.stats.gov.cn/search/english/s?qt=",
+            "URL_End": "",
+            "SearchSelector": "div.content",
+            "Attribute": {"class":"fontlan"},
+            "tag": "div",
+            "tag_class": "news",
+            "ResultSelector": "div.cont",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Brazil":{
+            "Name": "Brazilian Institute of Geography and Statistics",
+            "URL_Start": "https://www.ibge.gov.br/en/busca.html?searchword=",
+            "URL_End": "",
+            "SearchSelector": "div.busca__item ",
+            "Attribute": {"target":"_blank"},
+            "tag": "p",
+            "tag_class": "busca__item--link",
+            "ResultSelector": "span.itens_conteudos",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Mexico":{
+            "Name": "National System of Statistical and Geographical Information",
+            "URL_Start": "https://en.www.inegi.org.mx/app/buscador/default.html?q=",
+            "URL_End": "",
+            "SearchSelector": "div.img-prod-map",
+            "Attribute": {"id": re.compile(r"^TituloHip-\d+$")},
+            "tag": "div",
+            "tag_class": "col-xs-12",
+            "ResultSelector": "img.bbl-sombreado",
+            "Result_URL_Start": "https://en.www.inegi.org.mx",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
