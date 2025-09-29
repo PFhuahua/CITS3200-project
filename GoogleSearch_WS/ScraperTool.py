@@ -99,47 +99,66 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
         try:
             return future.result(timeout=max_time)
         except TimeoutError:
-            print("Operation exceeded 30 seconds, returning partial results.")
+            print(f"Operation exceeded {max_time/1000} seconds, returning partial results.")
             return pdf_links  # whatever was collected before timeout
 
 
-def GetHTML(url: str):
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
 
-def scrape_Lib(url: str,selector: str):
-    # Parse base URL
+#Library scraping tools
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # headless=True means no window opens
-        page = browser.new_page()
-        page.goto(url)
-        try:
-            page.wait_for_selector(selector,timeout=15000)  # wait for results, timeout 15sec
-        except:
-            html = page.content()
-        html = page.content()  # get fully rendered HTML
-        browser.close()
-        return(html)
+def Scrape_Page(url: str, selector: str, visible: bool = False, headless: bool = True, timeout: int = 15000):
+    """
+    Scrape fully rendered HTML from a page after waiting for a selector.
     
-def scrape_Lib_Vis(url: str,selector: str):
-    # Parse base URL
-
+    Args:
+        url (str): The target URL.
+        selector (str): The CSS selector to wait for.
+        visible (bool): If True, waits until the element is visible. Otherwise just present.
+        headless (bool): If True, browser runs in headless mode (no window).
+        timeout (int): Maximum time (ms, 1000ms = 1sec) to wait for selector.
+        
+    Returns:
+        str: Rendered page HTML.
+    """
+    #print(url)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # headless=True means no window opens
+        browser = p.chromium.launch(headless=headless)
         page = browser.new_page()
         page.goto(url)
+
         try:
-            page.wait_for_selector(selector , state ="visible",timeout=15000)  # wait for results, timeout 15sec
-        except:
+            wait_state = "visible" if visible else "attached"
+            page.wait_for_selector(selector, state=wait_state, timeout=timeout)
             html = page.content()
-        html = page.content()  # get fully rendered HTML
+        except Exception as e:
+            #print(f"Err {e}, on {url} Attempting to Scrape HTML.")
+            html = page.content()
+
         browser.close()
-        return(html)
+        return html
 
 
-def Find_Lib_Results(html,attrs,tag,tag_class):
+def Hyperlink_Extractor(html,attrs,tag,tag_class):
+    """
+    Extracts hyperlinks from HTML by searching for specific tags, classes, and attribute filters.
+
+    This function parses the given HTML, looks for elements of type `tag` with `tag_class`
+    then collects all `<a>` elements inside them that match the provided attribute filters `attrs`. 
+    Returning a list of the extracted `href` links.
+
+    Args:
+        html (str): A string containing raw HTML to parse.
+        attrs (dict): A dictionary of an attribute to filter `<a>` tags. 
+        tag (str): The HTML tag to search for.
+        tag_class (str): The class name of the tag.
+
+    Returns:
+        list[str]: A list of hyperlink strings (`href` attribute values).
+
+    Notes:
+        - Uses BeautifulSoup with the "html.parser" backend.
+        - Returns an empty list if no matches are found.
+    """
 
     soup = BeautifulSoup(html, "html.parser")
 
@@ -147,7 +166,7 @@ def Find_Lib_Results(html,attrs,tag,tag_class):
     links = []
     for div in soup.find_all(tag, class_=tag_class):
         #print(div)
-        a_tags = div.find_all("a", attrs=attrs)  # find ALL matches, not just on
+        a_tags = div.find_all("a", attrs=attrs)  # find ALL matches, not just one
         #print(a_tags)
         for a in a_tags:
             if a.has_attr("href"):
@@ -155,3 +174,10 @@ def Find_Lib_Results(html,attrs,tag,tag_class):
     
     #print(links)
     return(links)
+
+
+# USED FOR DEBUG 
+def GetHTML(url: str):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text

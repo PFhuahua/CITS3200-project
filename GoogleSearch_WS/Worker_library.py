@@ -1,12 +1,12 @@
 import requests
-from ScraperTool import scrape_Lib,Find_Lib_Results,scrape_Lib_Vis # type: ignore
+from ScraperTool import Scrape_Page,Hyperlink_Extractor # type: ignore
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import re
 
-def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5):
+def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5, timeout= 15000):
     """
     Scrapes search results and detail pages for a given library.
 
@@ -16,18 +16,19 @@ def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5):
         Search (str): The search query.
         ResultsPerLib (int): How many results to keep per library.
         max_workers (int): Number of threads to run in parallel.
+        timeout (int): Maximum time (ms, 1000ms = 1sec) to wait for a page to load.
 
     Returns:
-        list[str]: A list of HTML snippets (truncated to 1000 chars each).
+        list[str]: A list of HTML extracted and filtered for text.
     """
     HTMLS = [] 
 
     # Build query URL
     Query = Library[lib_name]["URL_Start"] + Search + Library[lib_name]["URL_End"]
-    html_text = scrape_Lib(Query, Library[lib_name]["SearchSelector"])
+    html_text = Scrape_Page(Query, Library[lib_name]["SearchSelector"],timeout = timeout)
 
     # Extract result links
-    links = Find_Lib_Results(html_text,
+    links = Hyperlink_Extractor(html_text,
                              Library[lib_name]["Attribute"],
                              Library[lib_name]["tag"],
                              Library[lib_name]["tag_class"])
@@ -36,9 +37,9 @@ def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5):
     # Scraper wrapper for detail pages
     def scrape_wrapper(link):
         if Library[lib_name]["Visible"]:
-            return link, scrape_Lib_Vis(link, Library[lib_name]["ResultSelector"])
+            return link, Scrape_Page(link, Library[lib_name]["ResultSelector"], visible = True,timeout = timeout)
         else:
-            return link, scrape_Lib(link, Library[lib_name]["ResultSelector"])
+            return link, Scrape_Page(link, Library[lib_name]["ResultSelector"],timeout = timeout)
 
     # Run scraping in parallel
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
