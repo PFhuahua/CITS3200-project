@@ -247,6 +247,9 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
     ResultsPerLib = NumResults
     Search = Query
 
+    # Merge List of libs to always search and specified libs 
+    if (SpecifiedLibs != None):  libsToCheck = list(set(libsToCheck + SpecifiedLibs))
+
     #https://unstats.un.org/home/nso_sites/ France
     Library = {
         "France":{
