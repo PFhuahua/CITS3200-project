@@ -6,6 +6,25 @@ import re
 from SpecifiedLibraryFunc import scrape_library  # type: ignore
 
 def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 6):
+    """
+    Uses Search Feature on National libraries simultaneously using a given query.
+    
+    Args:
+        Query (str): The search queried directly to libraries.
+
+        SpecifiedLibs (list[str]): Additional library sources to include in the search. 
+
+        NumResults (int, optional): The number of top results scraped and outputted per library search. Default is 2.
+
+        max_workers (int, optional): The maximum number of concurrent threads used. Defaults to 6.
+
+    Returns:
+        dict: A dictionary mapping each library name to a list of result links and visible text extracted. 
+
+    Notes:
+        - The function always calls a set of priority libraries ontop of those specified in the parameter.
+        - If a library search fails or finds no result to scrape the dict entry defaults to [], and execution continues.
+    """
     libsToCheck = ["Texas","France","Spain","Britian","Germany","Netherlands","Portugal","Canada","London","United States","National Archives","South Africa"] 
     ResultsPerLib = NumResults
     Search = Query
@@ -243,6 +262,25 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
 
 
 def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 6):
+    """
+    Uses Search Feature on National Bureaus simultaneously using a given query.
+    
+    Args:
+        Query (str): The search queried directly to bureaus.
+
+        SpecifiedLibs (list[str]): Additional bureau sources to include in the search. 
+
+        NumResults (int, optional): The number of top results scraped and outputted per bureau search. Default is 2.
+
+        max_workers (int, optional): The maximum number of concurrent threads used. Defaults to 6.
+
+    Returns:
+        dict: A dictionary mapping each bureau name to a list of result links and visible text extracted. 
+
+    Notes:
+        - The function always calls a set of priority bureau ontop of those specified in the parameter.
+        - If a bureau search fails or finds no result to scrape the dict entry defaults to [], and execution continues.
+    """
     libsToCheck = ["France"] 
     ResultsPerLib = NumResults
     Search = Query
