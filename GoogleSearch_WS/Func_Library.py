@@ -474,6 +474,19 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Phillipines":{
+            "Name": "Republic of the Philippines Statistics Authority",
+            "URL_Start": "https://psa.gov.ph/search/content?keys=",
+            "URL_End": "",
+            "SearchSelector": "div.content",
+            "Attribute": {},
+            "tag": "ol",
+            "tag_class": None,
+            "ResultSelector": "h3.page-title",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
