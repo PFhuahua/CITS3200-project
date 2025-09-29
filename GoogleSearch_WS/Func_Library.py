@@ -1,11 +1,10 @@
 import requests
-from ScraperTool import scrape_Lib,Find_Lib_Results,scrape_Lib_Vis
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
-from SpecifiedLibraryFunc import scrape_library  # type: ignore
+from Worker_library import scrape_library  # type: ignore
 
-def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 6):
+def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1, max_workers: int = 9, timeout= 15000):
     """
     Uses Search Feature on National libraries simultaneously using a given query.
     
@@ -17,6 +16,8 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
         NumResults (int, optional): The number of top results scraped and outputted per library search. Default is 2.
 
         max_workers (int, optional): The maximum number of concurrent threads used. Defaults to 6.
+
+        timeout (int): Maximum time (ms, 1000ms = 1sec) to wait for a page to load.
 
     Returns:
         dict: A dictionary mapping each library name to a list of result links and visible text extracted. 
@@ -239,7 +240,7 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
-            executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
+            executor.submit(scrape_library, Library, lib, Search, ResultsPerLib,timeout = timeout): lib
             for lib in libsToCheck
         }
 
@@ -261,7 +262,7 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
     return(results)
 
 
-def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 6):
+def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1, max_workers: int = 9, timeout= 15000):
     """
     Uses Search Feature on National Bureaus simultaneously using a given query.
     
@@ -273,6 +274,8 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
         NumResults (int, optional): The number of top results scraped and outputted per bureau search. Default is 2.
 
         max_workers (int, optional): The maximum number of concurrent threads used. Defaults to 6.
+
+        timeout (int): Maximum time (ms, 1000ms = 1sec) to wait for a page to load.
 
     Returns:
         dict: A dictionary mapping each bureau name to a list of result links and visible text extracted. 
@@ -309,7 +312,7 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
-            executor.submit(scrape_library, Library, lib, Search, ResultsPerLib): lib
+            executor.submit(scrape_library, Library, lib, Search, ResultsPerLib,timeout = timeout): lib
             for lib in libsToCheck
         }
 
@@ -327,3 +330,4 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
     end = time.time()
     #print(f"Elapsed time: {end - start:.4f} seconds")
     return(results)
+
