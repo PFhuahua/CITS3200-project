@@ -318,6 +318,58 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             "Result_URL_Start": " ",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "United Kingdom":{
+            "Name": "UK Office for national statistics",
+            "URL_Start": "https://www.ons.gov.uk/search?q=",
+            "URL_End": "",
+            "SearchSelector": "li.search__results__item",
+            "Attribute": {"data-gtm-search-result-page": "1"},
+            "tag": "li",
+            "tag_class": "search__results__item",
+            "ResultSelector": "div.section__content--markdown",
+            "Result_URL_Start": "https://www.ons.gov.uk",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Spain":{ # Spain Needs Further Testing
+            "Name": "Spanish National Institute of Statistics",
+            "URL_Start": "https://www.ine.es/buscar/searchResults.do?searchString=",
+            "URL_End": "&Menu_botonBuscador=&searchType=DEF_SEARCH&startat=0&L=1",
+            "SearchSelector": "li.records",
+            "Attribute": {"class": "rBuscFiles"},
+            "tag": "li",
+            "tag_class": "records",
+            "ResultSelector": "span.title",
+            "Result_URL_Start": "https://www.ine.es/",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Portugal":{ 
+            "Name": "National Institute of Statistics Portugal",
+            "URL_Start": "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_pesquisa&frm_accao=PESQUISAR&frm_show_page_num=1&frm_modo_pesquisa=PESQUISA_SIMPLES&frm_texto=",
+            "URL_End": "&frm_modo_texto=MODO_TEXTO_ALL&frm_data_ini=&frm_data_fim=&frm_tema=QUALQUER_TEMA&frm_area=o_ine_area_Publicacoes",
+            "SearchSelector": "table.pesquisa_cells_coladas",
+            "Attribute": {"class": "linkdestaques"},
+            "tag": "div",
+            "tag_class": "linkdestaques",
+            "ResultSelector": "img.img-responsive",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Germany":{ 
+            "Name": "Germany Federal Statistical Office",
+            "URL_Start": "https://www.destatis.de/SiteGlobals/Forms/Suche/EN/Expertensuche_Formular.html?templateQueryString=",
+            "URL_End": "&documentType_=publication#searchresults",
+            "SearchSelector": "div.c-result__doctype",
+            "Attribute": {},
+            "tag": "h3",
+            "tag_class": "c-result__heading",
+            "ResultSelector": "strong.label",
+            "Result_URL_Start": "https://www.destatis.de/",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
