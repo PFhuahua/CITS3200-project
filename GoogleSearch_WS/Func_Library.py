@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from Worker_library import scrape_library  # type: ignore
 
-def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1, max_workers: int = 9, timeout= 15000):
+def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 9, timeout= 15000):
     """
     Uses Search Feature on National libraries simultaneously using a given query.
     
@@ -249,14 +249,14 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
                 results[lib_name] = future.result()
             except Exception as e:
                 print(f"{lib_name} failed: {e}")
-        for key, value in results.items():
+        '''for key, value in results.items():
             for v in value:
-                print(key, v[0])
+                print(key, v[0])'''
 
     return(results)
 
 
-def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1, max_workers: int = 9, timeout= 15000):
+def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 4, max_workers: int = 9, timeout= 15000):
     """
     Uses Search Feature on National Bureaus simultaneously using a given query.
     
@@ -265,7 +265,7 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
 
         SpecifiedLibs (list[str]): Additional bureau sources to include in the search. 
 
-        NumResults (int, optional): The number of top results scraped and outputted per bureau search. Default is 2.
+        NumResults (int, optional): The number of top results scraped and outputted per bureau search. Default is 4.
 
         max_workers (int, optional): The maximum number of concurrent threads used. Defaults to 6.
 
@@ -497,9 +497,9 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
                 results[lib_name] = future.result()
             except Exception as e:
                 print(f"{lib_name} failed: {e}")
-        for key, value in results.items():
+        '''for key, value in results.items():
             for v in value:
-                print(key, v[0])
+                print(key, v[0])'''
 
     return(results)
 

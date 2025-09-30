@@ -1,5 +1,5 @@
-For the testing environment first run 
-```pip install -r requirements.txt```
+For the testing environment please run
+```python3 Setup.py```
 for all of the required libraries.
 
 Then create a `.env` file under the `GoogleSearch_WS/` folder as follows:

@@ -2,6 +2,20 @@ import requests
 from ScraperTool import scrape_pdfs
 from ScraperTool import process_pdf_link
 
+"""
+    Search for PDFs using Google Custom Search API and Return Results into a List of Tuples.
+
+    Parameters:
+    - Query: search query string
+    - Filters: list of strings to exclude from results (domains or file types)
+    - MaxPDFs: max number of PDFs to return
+    - ResultsSearched: total number of search results to scan
+    - api_key: Google API key
+    - Searchcx: Google Custom Search Engine ID
+
+    Returns:
+    - unique_results: list of tuples (PDF URL, PDF size in bytes or None, Title, Snippet)
+"""
 def PDF_Google_WS(
     Query: str = None,
     Filters: list[str] = ["wikipedia","statista","worldbank","unstats","usa.ipums.org","international.ipums.org","redatam.org","ourworldindata","www.un.org","www.oecd.",".docx"],
@@ -10,20 +24,6 @@ def PDF_Google_WS(
     api_key: str = None,
     Searchcx: str = None):
 
-    """
-    Search for PDFs using Google Custom Search API and Return Results into a List of Tuples.
-    
-    Parameters:
-    - Query: search query string
-    - Filters: list of strings to exclude from results (domains or file types)
-    - MaxPDFs: max number of PDFs to return
-    - ResultsSearched: total number of search results to scan
-    - api_key: Google API key
-    - Searchcx: Google Custom Search Engine ID
-    
-    Returns:
-    - unique_results: list of tuples (PDF URL, PDF size in bytes or None, Title, Snippet)
-    """
     if Query == None or api_key == None or Searchcx == None:
         print("Error: Query, api_key, and Searchcx must be provided.")
         return []
@@ -91,16 +91,7 @@ def PDF_Google_WS(
 
     return(unique_results) # PDF URL, PDF size (bytes), PDF Title, PDF Snippet
 
-def LIB_Google_WS(
-    NonExactTags: str = None,
-    ExactTags: str = None,
-    Filters: list[str] = [".docx"],
-    MaxHTML: int = 5,
-    ResultsSearched: int = 5,
-    api_key: str = "API",
-    Searchcx: str = "97c19d00f487341b6"):
-
-    """
+"""
     Search Lib matches using Google Custom Search API and Return Results into a List of Tuples.
     
     Parameters:
@@ -114,7 +105,15 @@ def LIB_Google_WS(
     
     Returns:
     - unique_results: list of tuples (PDF URL, PDF size in bytes or None, Title, Snippet)
-    """
+"""
+def LIB_Google_WS(
+    NonExactTags: str = None,
+    ExactTags: str = None,
+    Filters: list[str] = [".docx"],
+    MaxHTML: int = 5,
+    ResultsSearched: int = 5,
+    api_key: str = "API",
+    Searchcx: str = "97c19d00f487341b6"):
 
     if ExactTags == None: ExactTags = " "
     if NonExactTags == None : NonExactTags = " "
