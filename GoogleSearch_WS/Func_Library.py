@@ -236,8 +236,6 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
     #for libs in Library: print(Library[libs]["Name"])
     #for libs in Library: print(Library[libs]["Attribute"])
 
-    start = time.time()
-
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(scrape_library, Library, lib, Search, ResultsPerLib,timeout = timeout): lib
@@ -255,10 +253,6 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             for v in value:
                 print(key, v[0])
 
-
-
-    end = time.time()
-    #print(f"Elapsed time: {end - start:.4f} seconds")
     return(results)
 
 
@@ -490,8 +484,6 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
         }
     }
 
-    start = time.time()
-
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(scrape_library, Library, lib, Search, ResultsPerLib,timeout = timeout): lib
@@ -509,9 +501,5 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 1
             for v in value:
                 print(key, v[0])
 
-
-
-    end = time.time()
-    #print(f"Elapsed time: {end - start:.4f} seconds")
     return(results)
 
