@@ -216,6 +216,71 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "Result_URL_Start": "https://www.bksh.al",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Aruba":{
+            "Name": "Aruba National Library",
+            "URL_Start": "https://bibliotecanacional.on.worldcat.org/search?queryString=",
+            "URL_End": " ",
+            "SearchSelector": "div.cssltr-110i50s",
+            "Attribute": {"class": "MuiTypography-root MuiTypography-body1 MuiLink-root MuiLink-underlineAlways cssltr-9mpld1"},
+            "tag": "div",
+            "tag_class": "MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation4 jss198 cssltr-110i50s",
+            "ResultSelector": "div.jss138",
+            "Result_URL_Start": "https://bibliotecanacional.on.worldcat.org",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Australia":{
+            "Name": "National Library of Australia",
+            "URL_Start": "https://catalogue.nla.gov.au/search?q=",
+            "URL_End": " ",
+            "SearchSelector": "div.col",
+            "Attribute": {},
+            "tag": "h3",
+            "tag_class": "bento-item-title col-12",
+            "ResultSelector": "div.document-main-section",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Austria":{
+            "Name": "Austrian National Library",
+            "URL_Start": "https://search.onb.ac.at/primo-explore/search?institution=43ACC_ONB&vid=ONB&tab=default_tab&search_scope=ONB_gesamtbestand&mode=basic&displayMode=full&bulkSize=10&highlight=true&dum=true&displayField=all&query=any,contains,",
+            "URL_End": " ",
+            "SearchSelector": "div.result-item-image",
+            "Attribute": {"ng-class": "::{'full-view-mouse-pointer':$ctrl.isFullView}"},
+            "tag": "h3",
+            "tag_class": "item-title",
+            "ResultSelector": "img.main-img",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Azerbaijan":{
+            "Name": "Akhundov National Library",
+            "URL_Start": "https://ek.anl.az/search/query?term_1=",
+            "URL_End": "&locale=az&theme=e-kataloq",
+            "SearchSelector": "div.formatImage",
+            "Attribute": {"class": "title"},
+            "tag": "div",
+            "tag_class": "record",
+            "ResultSelector": "img.main-img",
+            "Result_URL_Start": "https://ek.anl.az",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Bahamas" :{
+            "Name": "Bahamas National Library",
+            "URL_Start": "https://nlis.goalexandria.com/search?search=(((title%3A%3A",
+            "URL_End": "))%20%26%26%20(hidetitle%3A%3A0))",
+            "SearchSelector": "div.item-picture",
+            "Attribute": {},
+            "tag": "div",
+            "tag_class": "item-container",
+            "ResultSelector": "div.item-picture",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
