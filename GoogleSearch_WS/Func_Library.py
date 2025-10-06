@@ -26,7 +26,7 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
         - The function always calls a set of priority libraries ontop of those specified in the parameter.
         - If a library search fails or finds no result to scrape the dict entry defaults to [], and execution continues.
     """
-    libsToCheck = ["Texas","France","Spain","Britian","Germany","Netherlands","Portugal","Canada","London","United States","National Archives","South Africa"] 
+    libsToCheck = ["Texas","France","Spain","Britian","Germany","Netherlands","Portugal","Canada","London","National Archives","South Africa"] 
     ResultsPerLib = NumResults
     Search = Query
 
@@ -165,19 +165,6 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "Visible": True,
             "CAPTCHA": False
         },
-        "United States":{
-            "Name": "United States Census Bureau",
-            "URL_Start": "https://www.census.gov/search-results.html?q=",
-            "URL_End": "&page=1&stateGeo=none&searchtype=web&cssp=SERP&_charset_=UTF-8",
-            "SearchSelector": "div.uscb-search-result__page-snippet",
-            "Attribute": {"onclick":"searchCustomEvent('ORG:https:\/\/www.census.gov\/about\/history\/bureau\\u002Dhistory\/census\\u002Dpeople\/census\\u002Ddirectors.html'"},
-            "tag": "div",
-            "tag_class": "search-results",
-            "ResultSelector": "img.main-img",
-            "Result_URL_Start": "",
-            "Visible": True,
-            "CAPTCHA": False
-        },
         "National Archives":{
             "Name": "United States National Archives",
             "URL_Start": "https://search.archives.gov/search?affiliate=national-archives&query=",
@@ -256,7 +243,7 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
     return(results)
 
 
-def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 4, max_workers: int = 9, timeout= 15000):
+def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 9, timeout= 15000, toggle: bool = False):
     """
     Uses Search Feature on National Bureaus simultaneously using a given query.
     
@@ -271,6 +258,8 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 4
 
         timeout (int): Maximum time (ms, 1000ms = 1sec) to wait for a page to load.
 
+        toggle (bool): Toggle a specified only search with 4 more results without the always call bureaus.
+
     Returns:
         dict: A dictionary mapping each bureau name to a list of result links and visible text extracted. 
 
@@ -278,12 +267,18 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 4
         - The function always calls a set of priority bureau ontop of those specified in the parameter.
         - If a bureau search fails or finds no result to scrape the dict entry defaults to [], and execution continues.
     """
-    libsToCheck = ["France"] 
+    ToggleExtraSearches = 4
+    
+    libsToCheck = ["France","South Africa","United Kingdom","United States","Spain","Portugal","Germany","Netherlands","Belgium","China","Brazil","Mexico","Sweden","Canada","Phillipines"]
     ResultsPerLib = NumResults
     Search = Query
 
     # Merge List of libs to always search and specified libs 
     if (SpecifiedLibs != None):  libsToCheck = list(set(libsToCheck + SpecifiedLibs))
+
+    if (toggle and (SpecifiedLibs != None)): 
+        libsToCheck = SpecifiedLibs
+        ResultsPerLib += ToggleExtraSearches
 
     #https://unstats.un.org/home/nso_sites/ France
     Library = {
@@ -323,6 +318,19 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 4
             "tag_class": "search__results__item",
             "ResultSelector": "div.section__content--markdown",
             "Result_URL_Start": "https://www.ons.gov.uk",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "United States":{
+            "Name": "United States Census Bureau",
+            "URL_Start": "https://www.census.gov/search-results.html?q=",
+            "URL_End": "&page=1&stateGeo=none&searchtype=web&cssp=SERP&_charset_=UTF-8",
+            "SearchSelector": "div.uscb-search-result__page-snippet",
+            "Attribute": {"onclick":"searchCustomEvent('ORG:https:\/\/www.census.gov\/about\/history\/bureau\\u002Dhistory\/census\\u002Dpeople\/census\\u002Ddirectors.html'"},
+            "tag": "div",
+            "tag_class": "search-results",
+            "ResultSelector": "img.main-img",
+            "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
         },
@@ -452,19 +460,6 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 4
             "tag": "li",
             "tag_class": "mrgn-bttm-md",
             "ResultSelector": "div.mrgn-tp-md",
-            "Result_URL_Start": "",
-            "Visible": True,
-            "CAPTCHA": False
-        },
-        "Global":{
-            "Name": "globalEDGE",
-            "URL_Start": "https://globaledge.msu.edu/search?q=census#gsc.tab=0&gsc.q=",
-            "URL_End": "&gsc.page=1",
-            "SearchSelector": "div.gs-title",
-            "Attribute": {"target":"_parent"},
-            "tag": "div",
-            "tag_class": "gs-title",
-            "ResultSelector": "div.mdl-card__supporting-text",
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
