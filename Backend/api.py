@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from backend.db.db import SessionLocal
+from backend.db.db import engine
 from backend.db import models
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
@@ -34,6 +35,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+models.Base.metadata.create_all(bind=engine)
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
