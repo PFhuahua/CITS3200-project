@@ -281,6 +281,19 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Belgium" :{ # Belgium Takes a long time to load 
+            "Name": "Royal Library of Belgium",
+            "URL_Start": "https://opac.kbr.be/Library/search.aspx?SC=KBR_UNIFIED&QUERY=",
+            "URL_End": "&_lg=en-GB",
+            "SearchSelector": "img.img-thumbnail ermes-thumb ermes-thumb-size-MEDIUM",
+            "Attribute": {},
+            "tag": "div",
+            "tag_class": "vignette_container",
+            "ResultSelector": "mg.img-thumbnail ermes-thumb ermes-thumb-size-MEDIUM",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
