@@ -200,7 +200,7 @@
             "CAPTCHA": false
         },
 
-        "France_Bureau":{
+        "France":{
             "Name": "France National Institute of Statistics and Economic Studies",
             "URL_Start": "https://www.insee.fr/fr/recherche?idprec=8226711&q=",
             "URL_End": "&debut=0",
@@ -213,7 +213,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "South Africa_Bureau":{
+        "South Africa":{
             "Name": "Statistics South Africa",
             "URL_Start": "https://www.statssa.gov.za/?s=",
             "URL_End": "&sitem=publications",
@@ -226,7 +226,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "United Kingdom_Bureau":{
+        "United Kingdom":{
             "Name": "UK Office for national statistics",
             "URL_Start": "https://www.ons.gov.uk/search?q=",
             "URL_End": "",
@@ -239,7 +239,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Spain_Bureau":{ 
+        "Spain":{ 
             "Name": "Spanish National Institute of Statistics",
             "URL_Start": "https://www.ine.es/buscar/searchResults.do?searchString=",
             "URL_End": "&Menu_botonBuscador=&searchType=DEF_SEARCH&startat=0&L=1",
@@ -252,7 +252,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Portugal_Bureau":{ 
+        "Portugal":{ 
             "Name": "National Institute of Statistics Portugal",
             "URL_Start": "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_pesquisa&frm_accao=PESQUISAR&frm_show_page_num=1&frm_modo_pesquisa=PESQUISA_SIMPLES&frm_texto=",
             "URL_End": "&frm_modo_texto=MODO_TEXTO_ALL&frm_data_ini=&frm_data_fim=&frm_tema=QUALQUER_TEMA&frm_area=o_ine_area_Publicacoes",
@@ -265,7 +265,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Germany_Bureau":{ 
+        "Germany":{ 
             "Name": "Germany Federal Statistical Office",
             "URL_Start": "https://www.destatis.de/SiteGlobals/Forms/Suche/EN/Expertensuche_Formular.html?templateQueryString=",
             "URL_End": "&documentType_=publication#searchresults",
@@ -278,7 +278,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Netherlands_Bureau":{ 
+        "Netherlands":{ 
             "Name": "Statistics Netherlands (CBS)",
             "URL_Start": "https://www.cbs.nl/en-gb/search?q=",
             "URL_End": "&selectedtypes=publications&selectedperiod=all-periods&startdate=&enddate=&sortorder=0",
@@ -291,7 +291,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Belgium_Bureau":{ 
+        "Belgium":{ 
             "Name": "Statbel the Belgian statistical office",
             "URL_Start": "https://statbel.fgov.be/en/search?search_api_fulltext_block=",
             "URL_End": "&items_per_page=10",
@@ -304,7 +304,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "China_Bureau":{ 
+        "China":{ 
             "Name": "National Bureau of Statistics of China",
             "URL_Start": "https://www.stats.gov.cn/search/english/s?qt=",
             "URL_End": "",
@@ -317,7 +317,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Brazil_Bureau":{
+        "Brazil":{
             "Name": "Brazilian Institute of Geography and Statistics",
             "URL_Start": "https://www.ibge.gov.br/en/busca.html?searchword=",
             "URL_End": "",
@@ -330,7 +330,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Mexico_Bureau":{
+        "Mexico":{
             "Name": "National System of Statistical and Geographical Information",
             "URL_Start": "https://en.www.inegi.org.mx/app/buscador/default.html?q=",
             "URL_End": "",
@@ -343,7 +343,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Sweden_Bureau":{
+        "Sweden":{
             "Name": "Statistics Sweden",
             "URL_Start": "https://www.scb.se/en/finding-statistics/search/?query=census&Category=Publications&Date=Anytime&Q=",
             "URL_End": "&Page=1",
@@ -356,7 +356,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Canada_Bureau":{
+        "Canada":{
             "Name": "Statistics Canada",
             "URL_Start": "https://www.statcan.gc.ca/search/results/site-search?q=",
             "URL_End": "&op=&fq=stclac:2",
@@ -369,7 +369,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Global_Bureau":{
+        "Global":{
             "Name": "globalEDGE",
             "URL_Start": "https://globaledge.msu.edu/search?q=census#gsc.tab=0&gsc.q=",
             "URL_End": "&gsc.page=1",
@@ -382,7 +382,7 @@
             "Visible": true,
             "CAPTCHA": false
         },
-        "Phillipines_Bureau":{
+        "Phillipines":{
             "Name": "Republic of the Philippines Statistics Authority",
             "URL_Start": "https://psa.gov.ph/search/content?keys=",
             "URL_End": "",

@@ -216,9 +216,7 @@ def delete_library(lib_id: int, db: Session = Depends(get_db)):
 
 @app.post("/api/import-libraries")
 def import_libraries():
-    """
-    Import all libraries from backend/data/libraries.json into the database.
-    """
+    ## Import all libraries from backend/data/libraries.json into the database.
     db = SessionLocal()
 
     try:
