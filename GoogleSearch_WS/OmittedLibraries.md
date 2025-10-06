@@ -33,3 +33,48 @@ https://catalogo.bn.gov.ar/F/?request=census+2019&func=find-b&find_code=WRD&loca
 
 Armenia, Requires Special handling due to links being disconnected from content
 https://nla.am/en_US/ebsco
+
+Bahrain, Website search appears disfunctional/requires special permissions.
+https://libraryportal.icc.gov.bh/uhtbin/cgisirsi.exe/0/0/0/49
+
+Barbados, Website search appears disfunctional/requires special permissions.
+https://www.library.gov.bb/r
+
+Benin, Website search appears disfunctional/requires special permissions.
+https://bnb.bj/
+
+Bermuda, Requires Special handling due to links being disconnected from content.
+https://b10037.eos-intl.net/B10037/OPAC/Search/SimpleSearch.aspx
+
+Bhutan, Website search appears disfunctional/requires special permissions.
+https://ext.kb.dk/F/?func=file&file_name=find-b&local_base=bhu01&con_lng=ENG
+
+Botswana, No Document Search Function on Website.
+https://gov.bw/
+
+Bouvet Island, No National Library
+
+Brazil, Website search appears disfunctional/requires special permissions.
+http://bndigital.bn.br/hemeroteca-digital/
+
+British Indian Ocean Territory, No National Library
+
+Brunei Darussalam, No Document Search Function on Website.
+http://www.dewanbahasadanpustakalibrary.org/collection.php
+
+Burkina Faso, No National Library Website
+
+Burundi, Website search appears disfunctional/requires special permissions.
+http://www.nationallibraryofburundi.org/
+
+Cambodia, No Document Search Function on Website.
+https://nlc.gov.kh//en/collections/1
+
+Cameroon, No National Library Website
+
+Cayman Islands, Website search appears disfunctional/requires special permissions.
+http://cayman.booksys.net/opac/cipl/
+
+Central African Republic, No National Library
+
+Chad, No National Library Website
