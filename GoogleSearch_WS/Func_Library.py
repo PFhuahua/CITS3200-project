@@ -294,6 +294,97 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Belize" :{ 
+            "Name": "Belize National Library Service and Information System",
+            "URL_Start": "https://dloc.com/collections/inlsbze/results?q=",
+            "URL_End": "",
+            "SearchSelector": "div.BriefView_image__NZDFL",
+            "Attribute": {"class" : "image-link"},
+            "tag": "article",
+            "tag_class": "BriefView_container__MMnuA BriefView_lg__iDdkG",
+            "ResultSelector": "div.text-center order-1 order-xl-2 mt-4 col-xl-4 col-12",
+            "Result_URL_Start": "https://dloc.com",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Bolivia" :{ 
+            "Name": "National Archive and Library of Bolivia",
+            "URL_Start": "https://archivo-abnb.org.bo/index.php/informationobject/browse?topLod=0&query=",
+            "URL_End": "",
+            "SearchSelector": "p.title",
+            "Attribute": {},
+            "tag": "p",
+            "tag_class": "title",
+            "ResultSelector": "li.treeitem",
+            "Result_URL_Start": "https://archivo-abnb.org.bo",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Bosnia And Herzegovina" :{ 
+            "Name": "National and University Library of Bosnia and Herzegovina",
+            "URL_Start": "https://plus.cobiss.net/cobiss/bh/bs/bib/search?q=",
+            "URL_End": "",
+            "SearchSelector": "div.txtCenter",
+            "Attribute": {"class":"title value"},
+            "tag": "div",
+            "tag_class": "message",
+            "ResultSelector": "i.icon-1",
+            "Result_URL_Start": "https://plus.cobiss.net/cobiss/bh/bs/",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Bulgaria" :{ 
+            "Name": "SS. Cyril and Methodius National Library",
+            "URL_Start": "https://plus.cobiss.net/cobiss/bg/bg/bib/search?q=",
+            "URL_End": "",
+            "SearchSelector": "div.txtCenter",
+            "Attribute": {"class":"title value"},
+            "tag": "div",
+            "tag_class": "message",
+            "ResultSelector": "i.icon-1",
+            "Result_URL_Start": "https://plus.cobiss.net/cobiss/bg/bg/",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Cabo Verde" :{ 
+            "Name": "BIBLIOTECA NACIONAL DE CABO VERDE",
+            "URL_Start": "http://catalogo.bn.cv/cgi-bin/koha/opac-search.pl?idx=&q=",
+            "URL_End": "",
+            "SearchSelector": "div.results_summary",
+            "Attribute": {"class":"title"},
+            "tag": "div",
+            "tag_class": "title_summary",
+            "ResultSelector": "div.toptabs",
+            "Result_URL_Start": "http://catalogo.bn.cv",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Cabo Verde" :{ 
+            "Name": "BIBLIOTECA NACIONAL DE CABO VERDE",
+            "URL_Start": "http://catalogo.bn.cv/cgi-bin/koha/opac-search.pl?idx=&q=",
+            "URL_End": "",
+            "SearchSelector": "div.results_summary",
+            "Attribute": {"class":"title"},
+            "tag": "div",
+            "tag_class": "title_summary",
+            "ResultSelector": "div.toptabs",
+            "Result_URL_Start": "http://catalogo.bn.cv",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Chile" :{ 
+            "Name": "BIBLIOTECA NACIONAL DE CABO VERDE",
+            "URL_Start": "http://descubre.bibliotecanacional.gob.cl/primo-explore/search?query=any,contains,",
+            "URL_End": "&tab=bnc_tab&search_scope=bnc_completo&vid=BNC&offset=0",
+            "SearchSelector": "img.main-img",
+            "Attribute": {"ng-class":"::{'full-view-mouse-pointer':$ctrl.isFullView}"},
+            "tag": "h3",
+            "tag_class": "item-title",
+            "ResultSelector": "img.main-img",
+            "Result_URL_Start": "",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
