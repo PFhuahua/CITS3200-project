@@ -170,7 +170,9 @@ def Hyperlink_Extractor(html,attrs,tag,tag_class):
         #print(a_tags)
         for a in a_tags:
             if a.has_attr("href"):
-                links.append(a["href"])
+                href = a["href"] 
+                href = re.sub(r'^\.+', '', href) # Remove leading dots From link
+                links.append(href)
     
     #print(links)
     return(links)
