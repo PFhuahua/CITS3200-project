@@ -214,6 +214,48 @@ def delete_library(lib_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Library {lib_id} deleted successfully"}
 
+@app.post("/api/import-libraries")
+def import_libraries():
+    """
+    Import all libraries from backend/data/libraries.json into the database.
+    """
+    db = SessionLocal()
+
+    try:
+        with open("backend/data/libraries.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        for country, info in data.items():
+
+            lib = models.Library(
+                name=info["Name"],
+                url_start=info["URL_Start"],
+                result_url_start=info.get("Result_URL_Start", ""),
+                url_end=info.get("URL_End", ""),
+                search_selector=info["SearchSelector"],
+                attribute=info["Attribute"],
+                tag=info.get("tag", ""),
+                tag_class=info.get("tag_class", ""),
+                result_selector=info.get("ResultSelector", ""),
+                visible=info.get("Visible", True),
+                priority=info.get("Priority", 1),
+                country=country,
+                captcha=info.get("CAPTCHA", False)
+            )
+            db.add(lib)
+
+        db.commit()
+        return {"message": "Libraries imported success"}
+
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="libraries.json not found")
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+
+    finally:
+        db.close()
 
 # FilterLinks
 class FilterLinkCreate(BaseModel):
