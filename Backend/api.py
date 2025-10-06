@@ -4,7 +4,6 @@ from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from backend.db.db import SessionLocal
-from backend.db.db import engine
 from backend.db import models
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
@@ -36,7 +35,6 @@ def get_db():
     finally:
         db.close()
 
-models.Base.metadata.create_all(bind=engine)
 
 # CORS middleware
 app.add_middleware(
@@ -256,6 +254,104 @@ def import_libraries():
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
 
+    finally:
+        db.close()
+class BureauBase(BaseModel):
+    name: str
+    url_start: str
+    url_end: str | None = None
+    search_selector: str
+    attribute: dict
+    tag: str
+    tag_class: str
+    result_selector: str
+    visible: bool = True
+    priority: int = 1
+    country: str
+    captcha: bool = False
+
+class BureauCreate(BureauBase):
+    pass
+
+class BureauUpdate(BaseModel):
+    name: str | None = None
+    url_start: str | None = None
+    url_end: str | None = None
+    search_selector: str | None = None
+    attribute: dict | None = None
+    tag: str | None = None
+    tag_class: str | None = None
+    result_selector: str | None = None
+    visible: bool | None = None
+    priority: int | None = None
+    country: str | None = None
+    captcha: bool | None = None
+
+@app.post("/api/bureaus/")
+def create_bureau(bureau: BureauCreate, db: Session = Depends(get_db)):
+    db_bureau = models.Bureau(**bureau.dict())
+    db.add(db_bureau)
+    db.commit()
+    db.refresh(db_bureau)
+    return db_bureau
+
+@app.get("/api/bureaus/")
+def list_bureaus(db: Session = Depends(get_db)):
+    return db.query(models.Bureau).order_by(models.Bureau.priority.desc()).all()
+
+@app.put("/api/bureaus/{bureau_id}")
+def update_bureau(bureau_id: int, bureau: BureauUpdate, db: Session = Depends(get_db)):
+    db_bureau = db.query(models.Bureau).filter(models.Bureau.id == bureau_id).first()
+    if not db_bureau:
+        raise HTTPException(status_code=404, detail="Bureau not found")
+    for key, value in bureau.dict(exclude_unset=True).items():
+        setattr(db_bureau, key, value)
+    db.commit()
+    db.refresh(db_bureau)
+    return db_bureau
+
+@app.delete("/api/bureaus/{bureau_id}")
+def delete_bureau(bureau_id: int, db: Session = Depends(get_db)):
+    db_bureau = db.query(models.Bureau).filter(models.Bureau.id == bureau_id).first()
+    if not db_bureau:
+        raise HTTPException(status_code=404, detail="Bureau not found")
+    db.delete(db_bureau)
+    db.commit()
+    return {"message": f"Bureau {bureau_id} deleted successfully"}
+
+@app.post("/api/import-bureaus")
+def import_bureaus():
+    ##Import all bureaus from backend/data/bureaus.json into the database.
+    db = SessionLocal()
+    try:
+        with open("backend/data/bureaus.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        for country, info in data.items():
+            bureau = models.Bureau(
+                name=info["Name"],
+                url_start=info["URL_Start"],
+                result_url_start=info.get("Result_URL_Start", ""),
+                url_end=info.get("URL_End", ""),
+                search_selector=info["SearchSelector"],
+                attribute=info["Attribute"],
+                tag=info.get("tag", ""),
+                tag_class=info.get("tag_class", ""),
+                result_selector=info.get("ResultSelector", ""),
+                visible=info.get("Visible", True),
+                priority=info.get("Priority", 1),
+                country=country,
+                captcha=info.get("CAPTCHA", False)
+            )
+            db.add(bureau)
+
+        db.commit()
+        return {"message": "Bureaus imported success"}
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="bureaus.json not found")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
     finally:
         db.close()
 
