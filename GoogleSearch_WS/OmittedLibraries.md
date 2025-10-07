@@ -78,3 +78,19 @@ http://cayman.booksys.net/opac/cipl/
 Central African Republic, No National Library
 
 Chad, No National Library Website
+
+China, Requires Special handling due to links being disconnected from content.
+http://opac.nlc.cn/F/6XIPHRX946ICMF4XCDVS3BCVPPHUHIG9BTU53JNICN3G7QGP72-03756?func=find-m&request=census&find_code=WTP&adjacent=Y&x=60&y=12&FIND_BASE=NLC01&filter_request_1=&FIND_BASE=NLC09&filter_code_1=WLN&filter_request_1=&filter_code_2=WYR&filter_request_2=&filter_code_3=WYR&filter_request_3=&filter_code_4=WFM&filter_request_4=&filter_code_5=WSL&filter_request_5=
+
+Christmas Island, No National Library Website
+
+Cocos Islands, No National Library Website
+
+Comoros, No National Library Website
+
+Cook Islands, No National Library Website
+
+Costa Rica, Requires Special handling due to links being disconnected from content.
+https://www.sinabi.go.cr/default.aspx
+
+Cuba, No National Library Website
