@@ -8,3 +8,8 @@ googlesearch-python
 sqlalchemy
 pymysql
 cryptography
+google-generativeai
+beautifulsoup4
+playwright[browsers]
+pandas
+openpyxl
