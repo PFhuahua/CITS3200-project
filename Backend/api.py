@@ -222,7 +222,7 @@ def import_libraries():
     db = SessionLocal()
 
     try:
-        with open("backend/data/libraries.json", "r", encoding="utf-8") as f:
+        with open("Backend/data/libraries.json", "r", encoding="utf-8") as f:
             data = json.load(f)
 
         for country, info in data.items():
@@ -324,7 +324,7 @@ def import_bureaus():
     ##Import all bureaus from backend/data/bureaus.json into the database.
     db = SessionLocal()
     try:
-        with open("backend/data/bureaus.json", "r", encoding="utf-8") as f:
+        with open("Backend/data/bureaus.json", "r", encoding="utf-8") as f:
             data = json.load(f)
 
         for country, info in data.items():
