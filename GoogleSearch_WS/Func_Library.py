@@ -385,6 +385,32 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "Result_URL_Start": "",
             "Visible": True,
             "CAPTCHA": False
+        },
+        "Colombia" :{ 
+            "Name": "National Library of Colombia",
+            "URL_Start": "https://catalogoenlinea.bibliotecanacional.gov.co/client/es_ES/bd/search/results?qu=",
+            "URL_End":  "",
+            "SearchSelector": "img.results_img",
+            "Attribute": {"class": "detailLink text-h3"},
+            "tag": "div",
+            "tag_class": "stupid_ie_div",
+            "ResultSelector": "div.no_image_text",
+            "Result_URL_Start": "https://catalogoenlinea.bibliotecanacional.gov.co/",
+            "Visible": True,
+            "CAPTCHA": False
+        },
+        "Croatia" :{ 
+            "Name": "National and University Library Zagreb",
+            "URL_Start": "https://digitalna.nsk.hr/?pr=l&msq=",
+            "URL_End":  "",
+            "SearchSelector": "img.results_img",
+            "Attribute": {},
+            "tag": "div",
+            "tag_class": "row",
+            "ResultSelector": "div.indigo-recordinfo-image-link",
+            "Result_URL_Start": "https://digitalna.nsk.hr",
+            "Visible": True,
+            "CAPTCHA": False
         }
     }
 
