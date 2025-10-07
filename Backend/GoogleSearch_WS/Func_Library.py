@@ -1,8 +1,130 @@
 import requests
-import time
+import time,os, sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from Worker_library import scrape_library  # type: ignore
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+from backend.db.db import SessionLocal
+from backend.db.models import Library as LibraryModel, Bureau as BureauModel
+
+def integrate_db_call():
+    session = SessionLocal()
+  
+    try:
+        library_dict = {}
+        bureau_dict = {}
+
+        libraries = session.query(Library).all()
+        for lib in libraries:
+            country = getattr(lib, "country", None)
+            if not country:
+                continue
+            library_dict[country] = {
+                "id": lib.id,
+                "name": lib.name,
+                "url_start": lib.url_start,
+                "url_end": lib.url_end,
+                "result_url_start": lib.result_url_start,
+                "search_selector": lib.search_selector,
+                "attribute": lib.attribute,
+                "tag": lib.tag,
+                "tag_class": lib.tag_class,
+                "result_selector": lib.result_selector,
+                "visible": lib.visible,
+                "priority": lib.priority,
+                "captcha": lib.captcha,
+            }
+
+        bureaus = session.query(Bureau).all()
+        for bur in bureaus:
+            country = getattr(bur, "country", None)
+            if not country:
+                continue
+            bureau_dict[country] = {
+                "id": bur.id,
+                "name": bur.name,
+                "url_start": bur.url_start,
+                "url_end": bur.url_end,
+                "result_url_start": bur.result_url_start,
+                "search_selector": bur.search_selector,
+                "attribute": bur.attribute,
+                "tag": bur.tag,
+                "tag_class": bur.tag_class,
+                "result_selector": bur.result_selector,
+                "visible": bur.visible,
+                "priority": bur.priority,
+                "captcha": bur.captcha,
+            }
+        return library_dict, bureau_dict
+
+    finally:
+        session.close()
+
+class DBBackedLibrary(dict):
+    def __getitem__(self, country_name):
+        session = SessionLocal()
+        try:
+            results = session.query(LibraryModel).filter_by(country=country_name).all()
+            if not results:
+                raise KeyError(f"No library found for {country_name}")
+            return [
+                {
+                    "id": r.id,
+                    "name": r.name,
+                    "url_start": r.url_start,
+                    "url_end": r.url_end,
+                    "result_url_start": r.result_url_start,
+                    "search_selector": r.search_selector,
+                    "attribute": r.attribute,
+                    "tag": r.tag,
+                    "tag_class": r.tag_class,
+                    "result_selector": r.result_selector,
+                    "visible": r.visible,
+                    "priority": r.priority,
+                    "country": r.country,
+                    "captcha": r.captcha,
+                }
+                for r in results
+            ]
+        finally:
+            session.close()
+class DBBackedBureau(dict):
+    def __getitem__(self, country_name):
+        session = SessionLocal()
+        try:
+            results = session.query(BureauModel).filter_by(country=country_name).all()
+            if not results:
+                raise KeyError(f"No bureau found for {country_name}")
+            return [
+                {
+                    "id": r.id,
+                    "name": r.name,
+                    "url_start": r.url_start,
+                    "url_end": r.url_end,
+                    "result_url_start": r.result_url_start,
+                    "search_selector": r.search_selector,
+                    "attribute": r.attribute,
+                    "tag": r.tag,
+                    "tag_class": r.tag_class,
+                    "result_selector": r.result_selector,
+                    "visible": r.visible,
+                    "priority": r.priority,
+                    "country": r.country,
+                    "captcha": r.captcha,
+                }
+                for r in results
+            ]
+        finally:
+            session.close()
+
+
+# Instantiate the DB-backed dictionaries
+Library = DBBackedLibrary()
+Bureau = DBBackedBureau()
+
 
 def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2, max_workers: int = 9, timeout= 15000):
     """

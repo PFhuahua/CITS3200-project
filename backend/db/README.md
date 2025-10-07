@@ -100,3 +100,48 @@ password:3200
 USE project;
 SHOW TABLES; ##check tables
 DESCRIBE liberies;
+
+
+
+
+
+
+
+1·Database access instructions Func_Library.py has been updated
+Need to run python in the backend docker
+docker exec -it backend bash
+
+Load all data at once
+
+
+
+from backend.GoogleSearch_WS.Func_Library import integrate_db_call
+
+library_dict, bureau_dict = integrate_db_call()
+# Example usage
+print(library_dict["France"])         
+print(bureau_dict["Australia"])   
+
+
+Suitable for:
+You need to process all countries at once (e.g., for batch export or analysis).
+You don't need to update the database in real time while the application is running.
+
+
+Query by country dynamics
+This method supports writing Library["France"] directly, just like before. When accessed, it will automatically connect to the database, query the corresponding country data, and return it as a dictionary.
+
+
+from backend.GoogleSearch_WS.Func_Library import Library, Bureau
+
+lib_data = Library["France"]     # Automatically fetches France from DB
+bur_data = Bureau["France"]
+
+print(lib_data["url_start"])
+print(bur_data["search_selector"])
+
+
+
+You just need data for one country (e.g. Library["France"]).
+You want the data to be always up-to-date in real time.
+You can import both Library and integrate_db_call() at the same time without conflict.
