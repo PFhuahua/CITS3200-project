@@ -3,7 +3,7 @@ from sqlalchemy import (
     ForeignKey, JSON, Float, Boolean
 )
 from sqlalchemy.orm import relationship
-from backend.db.db import Base
+from Backend.db.db import Base
 import datetime
 
 

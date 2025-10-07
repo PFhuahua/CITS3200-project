@@ -7,8 +7,8 @@ from Worker_library import scrape_library  # type: ignore
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
-from backend.db.db import SessionLocal
-from backend.db.models import Library as LibraryModel, Bureau as BureauModel
+from Backend.db.db import SessionLocal
+from Backend.db.models import Library as LibraryModel, Bureau as BureauModel
 
 def integrate_db_call():
     session = SessionLocal()
