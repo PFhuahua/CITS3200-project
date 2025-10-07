@@ -1,3 +1,24 @@
+# Virtual Environment
+venv/
+env/
+.env
+
+# Export files (runtime outputs, not source data)
+Batch/exports/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
 venv
 venv/
 # Python
