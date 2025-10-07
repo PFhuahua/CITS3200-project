@@ -1,6 +1,6 @@
 from googlesearch import search
-from GoogleSearch_WS.Backend.ScraperTool import scrape_pdfs
-from Backend.GoogleSearch_WS.Backend.ScraperTool import process_pdf_link
+from Backend.GoogleSearch_WS.ScraperTool import scrape_pdfs
+from Backend.GoogleSearch_WS.ScraperTool import process_pdf_link
 import time
 
 Filters = ["wikipedia"]

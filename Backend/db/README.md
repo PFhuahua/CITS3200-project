@@ -6,7 +6,7 @@ https://www.docker.com/products/docker-desktop
 
 2.Project Structure
 CITS3200-project/
-├─ backend/
+├─ Backend/
 │ ├─ api.py ← FastAPI entry point
 │ ├─ db/
 │ │ ├─ db.py

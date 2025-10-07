@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from backend.db.db import SessionLocal
-from backend.db import models
+from Backend.db.db import SessionLocal
+from Backend.db import models
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import asyncio
