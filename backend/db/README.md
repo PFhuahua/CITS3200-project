@@ -108,6 +108,8 @@ DESCRIBE liberies;
 
 
 1·Database access instructions Func_Library.py has been updated
+Need to run python in the backend docker
+docker exec -it backend bash
 
 Load all data at once
 
