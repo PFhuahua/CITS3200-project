@@ -2,10 +2,10 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
-from fastapi import Depends
+from fastapi import Depends, Body
 from Backend.db.db import SessionLocal
 from Backend.db import models
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import asyncio
 import json
@@ -150,43 +150,62 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "version": "1.0.0"
-    }
+ }
 
 # Libraries
 class LibraryBase(BaseModel):
-    name: str
-    url_start: str
-    url_end: str | None = None
-    search_selector: str
-    attribute: dict
-    tag: str
-    tag_class: str
-    result_selector: str
-    visible: bool = True
-    priority: int = 1
-    country: str
-    captcha: bool = False
+    name: str = Field(..., alias="Name")
+    url_start: str = Field(..., alias="URL_Start")
+    url_end: str | None = Field(None, alias="URL_End")
+    result_url_start: str | None = Field(None, alias="Result_URL_Start")
+    search_selector: str = Field(..., alias="SearchSelector")
+    attribute: dict = Field(..., alias="Attribute")
+    tag: str = Field("", alias="tag")
+    tag_class: str = Field("", alias="tag_class")
+    result_selector: str = Field("", alias="ResultSelector")
+    visible: bool = Field(True, alias="Visible")
+    priority: int = Field(1, alias="Priority")
+    country: str = Field(..., alias="Country")
+    captcha: bool = Field(False, alias="CAPTCHA")
+    class Config:
+        allow_population_by_field_name = True
+        populate_by_name = True
+        extra = "ignore"
 
 class LibraryCreate(LibraryBase):
     pass
 
 class LibraryUpdate(BaseModel):
-    name: str | None = None
-    url_start: str | None = None
-    url_end: str | None = None
-    search_selector: str | None = None
-    attribute: dict | None = None
-    tag: str | None = None
-    tag_class: str | None = None
-    result_selector: str | None = None
-    visible: bool | None = None
-    priority: int | None = None
-    country: str | None = None
-    captcha: bool | None = None
+    name: str | None = Field(None, alias="Name")
+    url_start: str | None = Field(None, alias="URL_Start")
+    url_end: str | None = Field(None, alias="URL_End")
+    result_url_start: str | None = Field(None, alias="Result_URL_Start")
+    search_selector: str | None = Field(None, alias="SearchSelector")
+    attribute: dict | None = Field(None, alias="Attribute")
+    tag: str | None = Field(None, alias="tag")
+    tag_class: str | None = Field(None, alias="tag_class")
+    result_selector: str | None = Field(None, alias="ResultSelector")
+    visible: bool | None = Field(None, alias="Visible")
+    priority: int | None = Field(None, alias="Priority")
+    country: str | None = Field(None, alias="Country")
+    captcha: bool | None = Field(None, alias="CAPTCHA")
+
+    class Config:
+        allow_population_by_field_name = True
+        populate_by_name = True
+        extra = "ignore"
+  
 
 @app.post("/api/libraries/")
-def create_library(library: LibraryCreate, db: Session = Depends(get_db)):
-    db_lib = models.Library(**library.dict())
+def create_library(library_data: dict, db: Session = Depends(get_db)):
+    if len(library_data) == 1:
+        country, info = list(library_data.items())[0]
+        info["Country"] = country
+        lib = LibraryCreate(**info)
+    else:
+        lib = LibraryCreate(**library_data)
+
+    db_lib = models.Library(**lib.dict())
     db.add(db_lib)
     db.commit()
     db.refresh(db_lib)
@@ -257,38 +276,56 @@ def import_libraries():
     finally:
         db.close()
 class BureauBase(BaseModel):
-    name: str
-    url_start: str
-    url_end: str | None = None
-    search_selector: str
-    attribute: dict
-    tag: str
-    tag_class: str
-    result_selector: str
-    visible: bool = True
-    priority: int = 1
-    country: str
-    captcha: bool = False
+    name: str = Field(..., alias="Name")
+    url_start: str = Field(..., alias="URL_Start")
+    url_end: str | None = Field(None, alias="URL_End")
+    result_url_start: str | None = Field(None, alias="Result_URL_Start")
+    search_selector: str = Field(..., alias="SearchSelector")
+    attribute: dict = Field(..., alias="Attribute")
+    tag: str = Field("", alias="tag")
+    tag_class: str = Field("", alias="tag_class")
+    result_selector: str = Field("", alias="ResultSelector")
+    visible: bool = Field(True, alias="Visible")
+    priority: int = Field(1, alias="Priority")
+    country: str = Field(..., alias="Country")
+    captcha: bool = Field(False, alias="CAPTCHA")
+    class Config:
+        allow_population_by_field_name = True
+        populate_by_name = True
+        extra = "ignore"
 
 class BureauCreate(BureauBase):
     pass
 
 class BureauUpdate(BaseModel):
-    name: str | None = None
-    url_start: str | None = None
-    url_end: str | None = None
-    search_selector: str | None = None
-    attribute: dict | None = None
-    tag: str | None = None
-    tag_class: str | None = None
-    result_selector: str | None = None
-    visible: bool | None = None
-    priority: int | None = None
-    country: str | None = None
-    captcha: bool | None = None
+    name: str | None = Field(None, alias="Name")
+    url_start: str | None = Field(None, alias="URL_Start")
+    url_end: str | None = Field(None, alias="URL_End")
+    result_url_start: str | None = Field(None, alias="Result_URL_Start")
+    search_selector: str | None = Field(None, alias="SearchSelector")
+    attribute: dict | None = Field(None, alias="Attribute")
+    tag: str | None = Field(None, alias="tag")
+    tag_class: str | None = Field(None, alias="tag_class")
+    result_selector: str | None = Field(None, alias="ResultSelector")
+    visible: bool | None = Field(None, alias="Visible")
+    priority: int | None = Field(None, alias="Priority")
+    country: str | None = Field(None, alias="Country")
+    captcha: bool | None = Field(None, alias="CAPTCHA")
+
+    class Config:
+        allow_population_by_field_name = True
+        populate_by_name = True
+        extra = "ignore"
 
 @app.post("/api/bureaus/")
-def create_bureau(bureau: BureauCreate, db: Session = Depends(get_db)):
+def create_bureau(bureau_data: dict, db: Session = Depends(get_db)):
+    if len(bureau_data) == 1:
+        country, info = list(bureau_data.items())[0]
+        info["Country"] = country
+        bureau = BureauCreate(**info)
+    else:
+        bureau = BureauCreate(**bureau_data)
+
     db_bureau = models.Bureau(**bureau.dict())
     db.add(db_bureau)
     db.commit()

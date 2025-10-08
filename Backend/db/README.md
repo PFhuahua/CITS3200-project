@@ -103,6 +103,59 @@ DESCRIBE liberies;
 
 
 
+UPDATE:The POST interface of /api/libraries/ has been enhanced
+Pydantic's alias mechanism allows "Name" and "name" to be mixed
+
+{
+  "name": "University of Texas Libraries",
+  "url_start": "https://search.lib.utexas.edu/discovery/search?query=any,contains,",
+  "url_end": "&tab=Everything&vid=01UTAU_INST:SEARCH&offset=0&radios=resources&mode=simple",
+  "search_selector": "div.result-item-image",
+  "attribute": {
+    "ng-class": "::{'full-view-mouse-pointer':$ctrl.isFullView}"
+  },
+  "tag": "h3",
+  "tag_class": "item-title",
+  "result_selector": "div.bar.alert-bar",
+  "result_url_start": "",
+  "visible": true,
+  "priority": 1,
+  "country": "Texas",
+  "captcha": false
+}
+
+
+{
+  "Texas": {
+    "Name": "University of Texas Libraries",
+    "URL_Start": "https://search.lib.utexas.edu/discovery/search?query=any,contains,",
+    "URL_End": "&tab=Everything&vid=01UTAU_INST:SEARCH&offset=0&radios=resources&mode=simple",
+    "SearchSelector": "div.result-item-image",
+    "Attribute": {
+      "ng-class": "::{'full-view-mouse-pointer':$ctrl.isFullView}"
+    },
+    "tag": "h3",
+    "tag_class": "item-title",
+    "ResultSelector": "div.bar.alert-bar",
+    "Result_URL_Start": "",
+    "Visible": true,
+    "Priority": 1,
+    "CAPTCHA": false
+  }
+}##The system automatically recognizes the outer layer "Texas" as the value of the Country field
+
+
+POST /api/bureaus/ supports exactly the same structure, field naming conventions, and behavior.
+
+
+
+In addition to importing individual records via POST /api/libraries/ in Swagger, you can also add new data structures directly to an existing JSON file (e.g., libraries.json) and then call /api/import-libraries to import them all at once.
+
+
+
+
+
+
 
 
 
