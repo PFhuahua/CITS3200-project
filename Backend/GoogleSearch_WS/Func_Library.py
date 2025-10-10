@@ -33,9 +33,9 @@ def integrate_db_call():
                 "tag": lib.tag,
                 "tag_class": lib.tag_class,
                 "ResultSelector": lib.result_selector,
-                "visible": lib.visible,
+                "Visible": lib.visible,
                 "priority": lib.priority,
-                "captcha": lib.captcha,
+                "CAPTCHA": lib.captcha,
             }
 
         bureaus = session.query(Bureau).all()
