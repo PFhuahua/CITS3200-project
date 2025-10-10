@@ -25,14 +25,14 @@ def integrate_db_call():
             library_dict[country] = {
                 "id": lib.id,
                 "name": lib.name,
-                "url_start": lib.url_start,
-                "url_end": lib.url_end,
-                "result_url_start": lib.result_url_start,
-                "search_selector": lib.search_selector,
-                "attribute": lib.attribute,
+                "URL_Start": lib.url_start,
+                "URL_End": lib.url_end,
+                "Result_URL_Start": lib.result_url_start,
+                "SearchSelector": lib.search_selector,
+                "Attribute": lib.attribute,
                 "tag": lib.tag,
                 "tag_class": lib.tag_class,
-                "result_selector": lib.result_selector,
+                "ResultSelector": lib.result_selector,
                 "visible": lib.visible,
                 "priority": lib.priority,
                 "captcha": lib.captcha,
@@ -46,17 +46,17 @@ def integrate_db_call():
             bureau_dict[country] = {
                 "id": bur.id,
                 "name": bur.name,
-                "url_start": bur.url_start,
-                "url_end": bur.url_end,
-                "result_url_start": bur.result_url_start,
-                "search_selector": bur.search_selector,
-                "attribute": bur.attribute,
+                "URL_Start": bur.url_start,
+                "URL_End": bur.url_end,
+                "Result_URL_Start": bur.result_url_start,
+                "SearchSelector": bur.search_selector,
+                "Attribute": bur.attribute,
                 "tag": bur.tag,
                 "tag_class": bur.tag_class,
-                "result_selector": bur.result_selector,
-                "visible": bur.visible,
+                "ResultSelector": bur.result_selector,
+                "Visible": bur.visible,
                 "priority": bur.priority,
-                "captcha": bur.captcha,
+                "CAPTCHA": bur.captcha,
             }
         return library_dict, bureau_dict
 
@@ -70,25 +70,22 @@ class DBBackedLibrary(dict):
             results = session.query(LibraryModel).filter_by(country=country_name).all()
             if not results:
                 raise KeyError(f"No library found for {country_name}")
-            return [
-                {
+            r = results[0] 
+            return {
                     "id": r.id,
-                    "name": r.name,
-                    "url_start": r.url_start,
-                    "url_end": r.url_end,
-                    "result_url_start": r.result_url_start,
-                    "search_selector": r.search_selector,
-                    "attribute": r.attribute,
+                    "Name": r.name,
+                    "URL_Start": r.url_start,
+                    "URL_End": r.url_end,
+                    "Result_URL_Start": r.result_url_start,
+                    "SearchSelector": r.search_selector,
+                    "Attribute": r.attribute,
                     "tag": r.tag,
                     "tag_class": r.tag_class,
-                    "result_selector": r.result_selector,
-                    "visible": r.visible,
+                    "ResultSelector": r.result_selector,
+                    "Visible": r.visible,
                     "priority": r.priority,
-                    "country": r.country,
-                    "captcha": r.captcha,
-                }
-                for r in results
-            ]
+                    "CAPTCHA": r.captcha,
+            }
         finally:
             session.close()
 class DBBackedBureau(dict):
@@ -98,25 +95,23 @@ class DBBackedBureau(dict):
             results = session.query(BureauModel).filter_by(country=country_name).all()
             if not results:
                 raise KeyError(f"No bureau found for {country_name}")
-            return [
-                {
+            r = results[0] 
+            return{ 
                     "id": r.id,
-                    "name": r.name,
-                    "url_start": r.url_start,
-                    "url_end": r.url_end,
-                    "result_url_start": r.result_url_start,
-                    "search_selector": r.search_selector,
-                    "attribute": r.attribute,
+                    "Name": r.name,
+                    "URL_Start": r.url_start,
+                    "URL_End": r.url_end,
+                    "Result_URL_Start": r.result_url_start,
+                    "SearchSelector": r.search_selector,
+                    "Attribute": r.attribute,
                     "tag": r.tag,
                     "tag_class": r.tag_class,
-                    "result_selector": r.result_selector,
-                    "visible": r.visible,
+                    "ResultSelector": r.result_selector,
+                    "Visible": r.visible,
                     "priority": r.priority,
                     "country": r.country,
-                    "captcha": r.captcha,
+                    "CAPTCHA": r.captcha,
                 }
-                for r in results
-            ]
         finally:
             session.close()
 

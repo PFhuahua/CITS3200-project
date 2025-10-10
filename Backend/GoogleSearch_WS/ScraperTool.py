@@ -122,7 +122,7 @@ def Scrape_Page(url: str, selector: str, visible: bool = False, headless: bool =
     """
     #print(url)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
+        browser = p.chromium.launch(headless=headless,   args=['--no-sandbox', '--disable-setuid-sandbox'])
         page = browser.new_page()
         page.goto(url)
 
