@@ -14,6 +14,8 @@ services:
       - ./mysql_data:/var/lib/mysql
   backend:
     build: ./Backend
+    shm_size: '2gb'
+    mem_limit: '4g'
     container_name: backend
     command: uvicorn Backend.api:app --reload --host 0.0.0.0 --port 8000
     volumes:

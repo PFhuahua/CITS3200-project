@@ -2,7 +2,7 @@ from AITool import rank_web_results, match_result, generate_all_queries
 from Func_PDF_GoogleWS import PDF_Google_WS
 from dotenv import load_dotenv
 from convert_metadata_to_list import convert_file
-from Func_Library import Find_Lib_Results, Find_Bur_Results
+from Func_Library import Find_Lib_Results, Find_Bur_Results,integrate_db_call
 import google.generativeai as genai
 import os
 import time
@@ -292,6 +292,8 @@ numburresults = 5 # Number of bureau results to return OPTIONAL
 websearchresults = 5 # Number of PDF results to return
 websearchamt = 15 # Number of google searches
 maxworkers = 9 # Max number of parallel threads to use OPTIONAL
+
+integrate_db_call()
 
 res = singleFlow({
     "English Title": engTitle,

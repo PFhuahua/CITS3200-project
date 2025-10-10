@@ -17,7 +17,7 @@ def integrate_db_call():
         library_dict = {}
         bureau_dict = {}
 
-        libraries = session.query(Library).all()
+        libraries = session.query(LibraryModel).all()
         for lib in libraries:
             country = getattr(lib, "country", None)
             if not country:
@@ -38,7 +38,7 @@ def integrate_db_call():
                 "CAPTCHA": lib.captcha,
             }
 
-        bureaus = session.query(Bureau).all()
+        bureaus = session.query(BureauModel).all()
         for bur in bureaus:
             country = getattr(bur, "country", None)
             if not country:
