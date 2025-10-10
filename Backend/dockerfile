@@ -3,6 +3,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install -r requirements.txt && playwright install --with-deps && rm -rf /root/.cache/* /var/lib/apt/lists/*
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN pip install --no-cache-dir -r requirements.txt && \
+    playwright install --with-deps && \
+    rm -rf /root/.cache/* /var/lib/apt/lists/*
+
 COPY . .
 CMD ["uvicorn", "Backend.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
