@@ -53,12 +53,13 @@ Backend Census Bureau, Library and web scraper - Quick Start Steps
         root@<container-id>:/app#
     #
 
+
 3. Build the Database tables
 
     - Now that the terminal is inside the docker container run:
         python -m Backend.db.create_db
     
-    
+
 4. Populate Database tables
 
     -  Open the API documentation in a web brower:
@@ -77,85 +78,10 @@ Backend Census Bureau, Library and web scraper - Quick Start Steps
     Both data tables have been copied to your local database.
     The program is now ready to run.
 
+
 5. Run System Testing
 
     - In the terminal inside the docker container run:
         python Backend/GoogleSearch_WS/Systests.py
     
     This will output a system test of the entire backend.
-
-
-
-
-___
-More Info on Each Step
-___
-1. Download and Install Docker Desktop
-Docker isolates your environment. You do not need to manually install Python packages.
-__
-2. Set Environment Variables
-
-Required to connect to Google Search APIs.
-
-.env file is recommended, but manual configuration in SysTest.py is also valid.
-
-3. Start Docker services
-
-Launches FastAPI backend + MySQL database.
-
-Wait until you see: Uvicorn running on http://0.0.0.0:8000
-
-4. Access the backend container
-
-Gives a terminal inside the container.
-
-You can run Python scripts directly.
-
-5. Create database tables
-
-Initializes the database and creates tables for libraries, bureaus, and filters.
-
-6. Open the API documentation
-
-Access http://localhost:8000/docs
-
-Interact with all endpoints:
-
-Add libraries/bureaus
-
-View records
-
-Search census PDFs
-
-Download documents
-
-7. Add new records
-
-Single record: Use POST /api/libraries/ or POST /api/bureaus/
-
-Multiple records: Add entries to libraries.json and import via POST /api/import-libraries
-
-Example Library POST body:
-
-{
-  "name": "University of Texas Libraries",
-  "url_start": "https://search.lib.utexas.edu/discovery/search?query=any,contains,",
-  "url_end": "&tab=Everything&vid=01UTAU_INST:SEARCH&offset=0&radios=resources&mode=simple",
-  "search_selector": "div.result-item-image",
-  "attribute": {"ng-class": "::{'full-view-mouse-pointer':$ctrl.isFullView}"},
-  "tag": "h3",
-  "tag_class": "item-title",
-  "result_selector": "div.bar.alert-bar",
-  "visible": true,
-  "priority": 1,
-  "country": "Texas",
-  "captcha": false
-}
-
-8. Test your data
-
-GET /api/libraries/ or /api/bureaus/ to confirm entries.
-
-POST /api/search to search census PDFs.
-
-GET /api/download/{id} or POST /api/download/bulk to download results.
