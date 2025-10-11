@@ -530,7 +530,7 @@ def Find_Lib_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "CAPTCHA": False
         }
     }
-
+    
 
     #for libs in Library: print(Library[libs]["Name"])
     #for libs in Library: print(Library[libs]["Attribute"])
@@ -593,6 +593,7 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
         ResultsPerLib += ToggleExtraSearches
 
     #https://unstats.un.org/home/nso_sites/ France
+    
     Library = {
         "France":{
             "Name": "France National Institute of Statistics and Economic Studies",
@@ -790,7 +791,6 @@ def Find_Bur_Results(Query, SpecifiedLibs: list[str] = None, NumResults: int = 2
             "CAPTCHA": False
         }
     }
-
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(scrape_library, Library, lib, Search, ResultsPerLib,timeout = timeout): lib
