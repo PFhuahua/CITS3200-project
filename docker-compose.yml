@@ -22,5 +22,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=mysql+pymysql://root:3200@db:3306/project
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SEARCH_ID=${SEARCH_ID}
     depends_on:
       - db

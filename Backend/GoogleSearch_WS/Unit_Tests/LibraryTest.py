@@ -1,11 +1,11 @@
 import requests
-from ScraperTool import scrape_Lib,Find_Lib_Results,scrape_Lib_Vis
+from ..ScraperTool import scrape_Lib,Find_Lib_Results,scrape_Lib_Vis
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
-from SpecifiedLibraryFunc import scrape_library  # type: ignore
+from ..SpecifiedLibraryFunc import scrape_library  # type: ignore
 
-#Priority ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","United States","National Archives"] 
+#Priority ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","United States","National Archives"]
 
 libsToCheck = ["Texas","France","Spain","Britian","Congress","Germany","Netherlands","Portugal","Canada","London","United States","National Archives"]
 Search = "SEGUNDO CENSO DE LA REPUBLICA ARGENTINA"

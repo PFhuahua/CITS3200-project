@@ -1,5 +1,5 @@
 import requests
-from ScraperTool import Scrape_Page,Hyperlink_Extractor # type: ignore
+from .ScraperTool import Scrape_Page,Hyperlink_Extractor # type: ignore
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from playwright.sync_api import sync_playwright
@@ -21,7 +21,7 @@ def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5, ti
     Returns:
         list[str]: A list of HTML extracted and filtered for text.
     """
-    HTMLS = [] 
+    HTMLS = []
 
     # Build query URL
     Query = Library[lib_name]["URL_Start"] + Search + Library[lib_name]["URL_End"]
@@ -56,6 +56,6 @@ def scrape_library(Library, lib_name, Search, ResultsPerLib=5, max_workers=5, ti
             # Get text
             text = soup.get_text(separator=" ")
             body_content = re.sub(r"\s+", " ", text).strip()
-            HTMLS.append([link,body_content]) 
+            HTMLS.append([link,body_content])
 
     return HTMLS
