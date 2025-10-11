@@ -11,7 +11,7 @@ class Library(Base):
     __tablename__ = "libraries"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(191), nullable=False)     
+    name = Column(String(191), nullable=False, index=True)     
     url_start = Column(String(500), nullable=False)   
     url_end = Column(String(500)) 
     result_url_start = Column(String(500))                      
@@ -21,8 +21,8 @@ class Library(Base):
     tag_class = Column(String(100))
     result_selector = Column(String(200))
     visible = Column(Boolean, default=True)
-    priority = Column(Integer, default=1)
-    country = Column(String(100))
+    priority = Column(Integer, default=1, index=True)
+    country = Column(String(100), index=True)
     captcha = Column(Boolean, default=False)   
 
 class Bureau(Base):
@@ -30,7 +30,7 @@ class Bureau(Base):
        
        
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(191), nullable=False)     
+    name = Column(String(191), nullable=False, index=True)     
     url_start = Column(String(500), nullable=False)   
     url_end = Column(String(500)) 
     result_url_start = Column(String(500))                      
@@ -40,8 +40,8 @@ class Bureau(Base):
     tag_class = Column(String(100))
     result_selector = Column(String(200))
     visible = Column(Boolean, default=True)
-    priority = Column(Integer, default=1)
-    country = Column(String(100))
+    priority = Column(Integer, default=1, index=True)
+    country = Column(String(100), index=True)
     captcha = Column(Boolean, default=False)   
 class FilterLink(Base):
     __tablename__ = "filter_links"

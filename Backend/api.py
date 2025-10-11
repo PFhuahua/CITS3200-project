@@ -156,22 +156,21 @@ async def health_check():
 class LibraryBase(BaseModel):
     name: str = Field(..., alias="Name")
     url_start: str = Field(..., alias="URL_Start")
-    url_end: str | None = Field(None, alias="URL_End")
-    result_url_start: str | None = Field(None, alias="Result_URL_Start")
-    search_selector: str = Field(..., alias="SearchSelector")
-    attribute: dict = Field(..., alias="Attribute")
+    country: str = Field(..., alias="Country")
+
+    url_end: str | None = Field("", alias="URL_End")
+    result_url_start: str | None = Field("", alias="Result_URL_Start")
+    search_selector: str | None = Field("", alias="SearchSelector")
+    attribute: dict | None = Field({}, alias="Attribute")
     tag: str = Field("", alias="tag")
     tag_class: str = Field("", alias="tag_class")
     result_selector: str = Field("", alias="ResultSelector")
     visible: bool = Field(True, alias="Visible")
     priority: int = Field(1, alias="Priority")
-    country: str = Field(..., alias="Country")
-    captcha: bool = Field(False, alias="CAPTCHA")
     class Config:
         allow_population_by_field_name = True
         populate_by_name = True
         extra = "ignore"
-
 class LibraryCreate(LibraryBase):
     pass
 
@@ -198,13 +197,39 @@ class LibraryUpdate(BaseModel):
 
 @app.post("/api/libraries/")
 def create_library(library_data: dict, db: Session = Depends(get_db)):
+    def normalize_keys(d: dict):
+        new_dict = {}
+        for k, v in d.items():
+            if isinstance(v, dict):
+                v = normalize_keys(v)
+            new_dict[k.lower()] = v
+        return new_dict
+    library_data = normalize_keys(library_data)
+    
     if len(library_data) == 1:
         country, info = list(library_data.items())[0]
         info["Country"] = country
-        lib = LibraryCreate(**info)
+        info.setdefault("Name", country) 
     else:
-        lib = LibraryCreate(**library_data)
+        info = library_data
 
+    info.pop("CAPTCHA", None)
+
+    defaults = {
+        "URL_End": "",
+        "Result_URL_Start": "",
+        "SearchSelector": "",
+        "Attribute": {},
+        "tag": "",
+        "tag_class": "",
+        "ResultSelector": "",
+        "Visible": True,
+        "Priority": 1,
+    }
+    for key, value in defaults.items():
+        info.setdefault(key, value)
+    
+    lib = LibraryCreate(**info)
     db_lib = models.Library(**lib.dict())
     db.add(db_lib)
     db.commit()
@@ -278,17 +303,18 @@ def import_libraries():
 class BureauBase(BaseModel):
     name: str = Field(..., alias="Name")
     url_start: str = Field(..., alias="URL_Start")
-    url_end: str | None = Field(None, alias="URL_End")
-    result_url_start: str | None = Field(None, alias="Result_URL_Start")
-    search_selector: str = Field(..., alias="SearchSelector")
-    attribute: dict = Field(..., alias="Attribute")
+    country: str = Field(..., alias="Country")
+
+    url_end: str | None = Field("", alias="URL_End")
+    result_url_start: str | None = Field("", alias="Result_URL_Start")
+    search_selector: str | None = Field("", alias="SearchSelector")
+    attribute: dict | None = Field({}, alias="Attribute")
     tag: str = Field("", alias="tag")
     tag_class: str = Field("", alias="tag_class")
     result_selector: str = Field("", alias="ResultSelector")
     visible: bool = Field(True, alias="Visible")
     priority: int = Field(1, alias="Priority")
-    country: str = Field(..., alias="Country")
-    captcha: bool = Field(False, alias="CAPTCHA")
+
     class Config:
         allow_population_by_field_name = True
         populate_by_name = True
@@ -319,14 +345,41 @@ class BureauUpdate(BaseModel):
 
 @app.post("/api/bureaus/")
 def create_bureau(bureau_data: dict, db: Session = Depends(get_db)):
+    def normalize_keys(d: dict):
+        new_dict = {}
+        for k, v in d.items():
+            if isinstance(v, dict):
+                v = normalize_keys(v)
+            new_dict[k.lower()] = v
+        return new_dict
+
+    bureau_data = normalize_keys(bureau_data)
+
     if len(bureau_data) == 1:
         country, info = list(bureau_data.items())[0]
-        info["Country"] = country
-        bureau = BureauCreate(**info)
+        info["country"] = country
+        info.setdefault("name", country) 
     else:
-        bureau = BureauCreate(**bureau_data)
+        info = bureau_data
 
-    db_bureau = models.Bureau(**bureau.dict())
+    info.pop("captcha", None)
+
+    defaults = {
+        "url_end": "",
+        "result_url_start": "",
+        "searchselector": "",
+        "attribute": {},
+        "tag": "",
+        "tag_class": "",
+        "resultselector": "",
+        "visible": True,
+        "priority": 1,
+    }
+    for key, value in defaults.items():
+        info.setdefault(key, value)
+
+    bur = BureauCreate(**info)
+    db_bureau = models.Bureau(**bur.dict())
     db.add(db_bureau)
     db.commit()
     db.refresh(db_bureau)

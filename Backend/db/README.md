@@ -19,9 +19,15 @@ CITS3200-project/
 
 3.Start Docker services
 docker-compose up --build
+
 When you see
 Uvicorn running on http://0.0.0.0:8000,
 your backend is ready.
+
+
+build the tables 
+docker exec -it backend bash
+python -m Backend.db.create_db
 
 
 4.Open the API documentation
@@ -88,7 +94,6 @@ python -m venv .venv  ##No need Docker is an isolated environment
 .\.venv\Scripts\Activate.ps1  #windows
 source .venv/bin/activate  #Linux
 
-pip install -r backend/db/requirements.txt ##No need to manually pip install any packages
 
 ##for add table
 docker-compose down -v && docker-compose up --build  ##Delete old data and rebuild the database
@@ -145,6 +150,42 @@ Pydantic's alias mechanism allows "Name" and "name" to be mixed
 }##The system automatically recognizes the outer layer "Texas" as the value of the Country field
 
 
+Minimal Required Fields
+
+   Now only three fields are mandatory when creating a new library:
+
+  {
+  "Name": "France",
+  "URL_Start": "https://example.com/",
+  "Country": "France"
+  }
+
+  all other fields are optional and will be auto-filled with default values if not provided
+
+
+Nested Input Format Supported
+
+  Backward-compatible nested input still works:
+  {
+    "France": {
+      "URL_Start": "https://example.com/",
+      "SearchSelector": "div.result"
+    }
+  }
+
+CAPTCHA Field Hidden
+
+  The CAPTCHA field is:
+
+    Removed from API documentation (Swagger)
+
+    Ignored in all POST requests
+
+
+
+
+
+
 POST /api/bureaus/ supports exactly the same structure, field naming conventions, and behavior.
 
 
@@ -154,6 +195,28 @@ In addition to importing individual records via POST /api/libraries/ in Swagger,
 
 
 
+
+
+
+
+###
+Added indexes to libraries and bureaus tables to improve query performance.
+
+
+If tables already exist, run inside the DB container:
+ALTER TABLE libraries ADD INDEX idx_name (name);
+ALTER TABLE libraries ADD INDEX idx_country (country);
+ALTER TABLE libraries ADD INDEX idx_priority (priority);
+ALTER TABLE bureaus ADD INDEX idx_name (name);
+ALTER TABLE bureaus ADD INDEX idx_country (country);
+ALTER TABLE bureaus ADD INDEX idx_priority (priority);
+
+
+If you haven’t created tables yet, just rebuild
+
+docker compose up --build
+docker exec -it backend bash
+python -m Backend.db.create_db
 
 
 
