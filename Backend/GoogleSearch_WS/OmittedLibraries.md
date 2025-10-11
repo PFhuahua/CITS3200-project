@@ -3,7 +3,7 @@ A list of all National Libraries not implemented into the library search.
 
 Source: https://www.flagpictures.com/countries/national-libraries/
 
-All Countries Libraries within the website above not listed within in this document are integrated into the database/library search function.
+All Countries Libraries within the website above not listed within in this document up to and including Cuba are integrated into the database/library search function.
 
 ---
 |Country, Reason.

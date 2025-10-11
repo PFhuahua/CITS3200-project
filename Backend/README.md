@@ -1,161 +1,87 @@
-# Census PDF Finder API
+Backend Census Bureau, Library and web scraper - Quick Start Steps
 
-This is the FastAPI backend for the Census PDF Finder application. It provides API endpoints to search for and download census PDFs using the existing Python scraping tools.
+**Requirements:**
+1. Install Docker Desktop（Register for free）
+    https://www.docker.com/products/docker-desktop
 
-## Setup
+2. Set Environment Variables
+    Create a .env file under the Backend/GoogleSearch_WS/ folder with the following content:
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+        GEMINI_API_KEY=Your_Google_API_key
+        SEARCH_ID=Your_custom_search_engine_ID
+    _
+    Alternatively, you can manually configure Backend/GoogleSearch_WS/SysTest.py:
 
-2. **Start the API server:**
-   ```bash
-   python start_api.py
-   ```
-   
-   Or alternatively:
-   ```bash
-   uvicorn api:app --host 0.0.0.0 --port 8000 --reload
-   ```
+        load_dotenv()
+        GOOGLE_API_KEY = Your_Google_API_key
+        SEARCH_ID = Your_custom_search_engine_ID
+        genai.configure(api_key=GOOGLE_API_KEY)
+    _
+    To Generate a Google API key: https://aistudio.google.com/app/apikey
 
-3. **Access the API:**
-   - API Base URL: `http://localhost:8000/api`
-   - API Documentation: `http://localhost:8000/docs`
-   - Health Check: `http://localhost:8000/api/health`
+    To Generate a Custom Search ID: https://developers.google.com/custom-search/v1/introduction
 
-## API Endpoints
-### Libraries API
-- POST `/api/libraries/`
-- GET `/api/libraries/`
-- PUT `/api/libraries/{id}` 
-- DELETE `/api/libraries/{id}` 
 
-### Filters API
-- POST `/api/filters/` 
-- GET `/api/filters/` 
-- PUT `/api/filters/{id}` 
-- DELETE `/api/filters/{id}` 
+**Steps for Program Start:**
 
-### Search Census Documents
-```
-POST /api/search
-```
+1. Start Docker Services
+    - Open the Docker Desktop application "Docker Desktop.exe".
 
-**Request Body:**
-```json
-{
-  "year": "2020",
-  "country": "united-states",
-  "state": "california", 
-  "keyword": "migration",
-  "max_results": 20
-}
-```
+    - Then in Project terminal run:
+        docker-compose up --build
 
-**Response:**
-```json
-{
-  "results": [
-    {
-      "id": "uuid",
-      "titleEnglish": "California Migration Data 2020",
-      "country": "United States",
-      "province": "California",
-      "censusYear": 2020,
-      "publicationYear": 2021,
-      "authorPublisher": "Census Bureau",
-      "fileSizeMB": 5.0,
-      "numberOfPages": 0,
-      "fileTypes": ["PDF"],
-      "url": "https://example.com/census_2020_us.pdf",
-      "description": "Census document found for query: migration united states california census 2020"
-    }
-  ],
-  "total": 1,
-  "searchTime": 2.3,
-  "query": "migration united states california census 2020"
-}
-```
 
-### Download Single Document
-```
-GET /api/download/{document_id}
-```
+    Docker will build the images, install dependencies and start the containers.
+    Wait until you see messages like:
+        [+] Running 2/2
+        ✔ cits3200-project-backend  Built
+        ✔ Container backend         Recreated
 
-**Response:**
-```json
-{
-  "download_url": "https://example.com/census_2020_us.pdf",
-  "filename": "California Migration Data 2020.pdf",
-  "size_mb": 5.0
-}
-```
+        backend  | INFO:     Application startup complete.      
 
-### Download Multiple Documents
-```
-POST /api/download/bulk
-```
+    This means Docker has finished setting up, and you can move on to the next step.
 
-**Request Body:**
-```json
-{
-  "document_ids": ["uuid1", "uuid2", "uuid3"]
-}
-```
 
-**Response:** ZIP file containing the documents
+2. Access the backend container
 
-### Health Check
-```
-GET /api/health
-```
+    - Open a new Project terminal window and run:
+        docker exec -it backend bash
 
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2024-01-01T00:00:00Z",
-  "version": "1.0.0"
-}
-```
+    # note
+    You are now running inside of the docker container.
+    While in the docker container your terminal prompt appears as such:
+        root@<container-id>:/app#
+    #
 
-## Frontend Integration
 
-The frontend React application should be configured to connect to this API:
+3. Build the Database tables
 
-1. **Environment Variables:**
-   Create a `.env.local` file in the frontend directory:
-   ```
-   VITE_API_BASE_URL=http://localhost:8000/api
-   ```
+    - Now that the terminal is inside the docker container run:
+        python -m Backend.db.create_db
+    
 
-2. **CORS Configuration:**
-   The API is configured to allow requests from:
-   - `http://localhost:3000`
-   - `http://127.0.0.1:3000`
+4. Populate Database tables
 
-## Development
+    -  Open the API documentation in a web brower:
+        Visit http://localhost:8000/docs
 
-- The API uses in-memory caching for search results
-- Search results are stored in `search_cache` dictionary
-- For production, consider using a proper database
-- The API integrates with existing scraping tools in `GoogleSearch_WS/` and `LinkToDownload.py`
+    -  Import Library data on the API UI:
+        Open "[POST] /api/import-libraries,  Import Libraries" dropdown menu
+        Click [Try it out]
+        Then [Execute]
+    
+    -  Import Bureau data on the API UI:
+        Open "[POST] /api/import-bureaus,   Import Bureaus" dropdown menu
+        Click [Try it out]
+        Then [Execute]
+    
+    Both data tables have been copied to your local database.
+    The program is now ready to run.
 
-## Error Handling
 
-The API returns proper HTTP status codes and error messages:
+5. Run System Testing
 
-- `400` - Bad Request (invalid parameters)
-- `404` - Not Found (document not found)
-- `500` - Internal Server Error (search/download failed)
-
-Error responses include a `detail` field with the error message.
-
-##Run FastAPI + MySQL with Docker
-docker compose up -d --build ##Start services
-docker compose ps ##Check status
-
-docker compose exec backend python -m backend.db.create_db  ##Create database tables
-
-access api: http://localhost:8000/docs
+    - In the terminal inside the docker container run:
+        python Backend/GoogleSearch_WS/Systests.py
+    
+    This will output a system test of the entire backend.

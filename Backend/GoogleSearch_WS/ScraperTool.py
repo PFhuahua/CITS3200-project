@@ -55,7 +55,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
 
         # Get HTML content
         try:
-            #print(f"fetching: {url}")
+
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
 
@@ -70,7 +70,7 @@ def scrape_pdfs(url: str, filter_str: str = None, get_sizes: bool = True, max_ti
                             chunk, re.IGNORECASE)
                 )
                 if len(pdf_refs) > MaxPDFperPage: break
-            #print(len(html_content))
+
             #print(f"Successfully fetched: {url}, PDFs Found: {len(pdf_refs)}")
         except requests.exceptions.RequestException as e:
             #print(f"Skipped {url} due to request error: {e}")
@@ -120,11 +120,15 @@ def Scrape_Page(url: str, selector: str, visible: bool = False, headless: bool =
     Returns:
         str: Rendered page HTML.
     """
-    #print(url)
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=headless,   args=['--no-sandbox', '--disable-setuid-sandbox'])
         page = browser.new_page()
         page.goto(url)
+
+        # Fall back for selector non entry to wait till timeout
+        if selector == '':
+            selector = ":root:has(.no_such_class)"
 
         try:
             wait_state = "visible" if visible else "attached"
@@ -164,17 +168,23 @@ def Hyperlink_Extractor(html,attrs,tag,tag_class):
 
     # find <h3 class="item-title">, then get <a> inside it
     links = []
+
+    # Fall back for tag/class non entry to Check all Html for links with Attr
+    if tag == '':
+        tag == None
+    if tag_class == '':
+        tag_class = None
+    
     for div in soup.find_all(tag, class_=tag_class):
-        #print(div)
+
         a_tags = div.find_all("a", attrs=attrs)  # find ALL matches, not just one
-        #print(a_tags)
+
         for a in a_tags:
             if a.has_attr("href"):
                 href = a["href"] 
                 href = re.sub(r'^\.+', '', href) # Remove leading dots From link
                 links.append(href)
     
-    #print(links)
     return(links)
 
 
