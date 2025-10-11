@@ -1,161 +1,161 @@
-# Census PDF Finder API
+Backend Census Bureau, Library and web scraper - Quick Start Steps
 
-This is the FastAPI backend for the Census PDF Finder application. It provides API endpoints to search for and download census PDFs using the existing Python scraping tools.
+**Requirements:**
+1. Install Docker Desktop（Register for free）
+    https://www.docker.com/products/docker-desktop
 
-## Setup
+2. Set Environment Variables
+    Create a .env file under the Backend/GoogleSearch_WS/ folder with the following content:
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+        GEMINI_API_KEY=Your_Google_API_key
+        SEARCH_ID=Your_custom_search_engine_ID
+    _
+    Alternatively, you can manually configure Backend/GoogleSearch_WS/SysTest.py:
 
-2. **Start the API server:**
-   ```bash
-   python start_api.py
-   ```
-   
-   Or alternatively:
-   ```bash
-   uvicorn api:app --host 0.0.0.0 --port 8000 --reload
-   ```
+        load_dotenv()
+        GOOGLE_API_KEY = Your_Google_API_key
+        SEARCH_ID = Your_custom_search_engine_ID
+        genai.configure(api_key=GOOGLE_API_KEY)
+    _
+    To Generate a Google API key: https://aistudio.google.com/app/apikey
 
-3. **Access the API:**
-   - API Base URL: `http://localhost:8000/api`
-   - API Documentation: `http://localhost:8000/docs`
-   - Health Check: `http://localhost:8000/api/health`
+    To Generate a Custom Search ID: https://developers.google.com/custom-search/v1/introduction
 
-## API Endpoints
-### Libraries API
-- POST `/api/libraries/`
-- GET `/api/libraries/`
-- PUT `/api/libraries/{id}` 
-- DELETE `/api/libraries/{id}` 
 
-### Filters API
-- POST `/api/filters/` 
-- GET `/api/filters/` 
-- PUT `/api/filters/{id}` 
-- DELETE `/api/filters/{id}` 
+**Steps for Program Start:**
 
-### Search Census Documents
-```
-POST /api/search
-```
+1. Start Docker Services
+    - Open the Docker Desktop application "Docker Desktop.exe".
 
-**Request Body:**
-```json
+    - Then in Project terminal run:
+        docker-compose up --build
+
+
+    Docker will build the images, install dependencies and start the containers.
+    Wait until you see messages like:
+        [+] Running 2/2
+        ✔ cits3200-project-backend  Built
+        ✔ Container backend         Recreated
+
+        backend  | INFO:     Application startup complete.      
+
+    This means Docker has finished setting up, and you can move on to the next step.
+
+
+2. Access the backend container
+
+    - Open a new Project terminal window and run:
+        docker exec -it backend bash
+
+    # note
+    You are now running inside of the docker container.
+    While in the docker container your terminal prompt appears as such:
+        root@<container-id>:/app#
+    #
+
+3. Build the Database tables
+
+    - Now that the terminal is inside the docker container run:
+        python -m Backend.db.create_db
+    
+    
+4. Populate Database tables
+
+    -  Open the API documentation in a web brower:
+        Visit http://localhost:8000/docs
+
+    -  Import Library data on the API UI:
+        Open "[POST] /api/import-libraries,  Import Libraries" dropdown menu
+        Click [Try it out]
+        Then [Execute]
+    
+    -  Import Bureau data on the API UI:
+        Open "[POST] /api/import-bureaus,   Import Bureaus" dropdown menu
+        Click [Try it out]
+        Then [Execute]
+    
+    Both data tables have been copied to your local database.
+    The program is now ready to run.
+
+5. Run System Testing
+
+    - In the terminal inside the docker container run:
+        python Backend/GoogleSearch_WS/Systests.py
+    
+    This will output a system test of the entire backend.
+
+
+
+
+___
+More Info on Each Step
+___
+1. Download and Install Docker Desktop
+Docker isolates your environment. You do not need to manually install Python packages.
+__
+2. Set Environment Variables
+
+Required to connect to Google Search APIs.
+
+.env file is recommended, but manual configuration in SysTest.py is also valid.
+
+3. Start Docker services
+
+Launches FastAPI backend + MySQL database.
+
+Wait until you see: Uvicorn running on http://0.0.0.0:8000
+
+4. Access the backend container
+
+Gives a terminal inside the container.
+
+You can run Python scripts directly.
+
+5. Create database tables
+
+Initializes the database and creates tables for libraries, bureaus, and filters.
+
+6. Open the API documentation
+
+Access http://localhost:8000/docs
+
+Interact with all endpoints:
+
+Add libraries/bureaus
+
+View records
+
+Search census PDFs
+
+Download documents
+
+7. Add new records
+
+Single record: Use POST /api/libraries/ or POST /api/bureaus/
+
+Multiple records: Add entries to libraries.json and import via POST /api/import-libraries
+
+Example Library POST body:
+
 {
-  "year": "2020",
-  "country": "united-states",
-  "state": "california", 
-  "keyword": "migration",
-  "max_results": 20
+  "name": "University of Texas Libraries",
+  "url_start": "https://search.lib.utexas.edu/discovery/search?query=any,contains,",
+  "url_end": "&tab=Everything&vid=01UTAU_INST:SEARCH&offset=0&radios=resources&mode=simple",
+  "search_selector": "div.result-item-image",
+  "attribute": {"ng-class": "::{'full-view-mouse-pointer':$ctrl.isFullView}"},
+  "tag": "h3",
+  "tag_class": "item-title",
+  "result_selector": "div.bar.alert-bar",
+  "visible": true,
+  "priority": 1,
+  "country": "Texas",
+  "captcha": false
 }
-```
 
-**Response:**
-```json
-{
-  "results": [
-    {
-      "id": "uuid",
-      "titleEnglish": "California Migration Data 2020",
-      "country": "United States",
-      "province": "California",
-      "censusYear": 2020,
-      "publicationYear": 2021,
-      "authorPublisher": "Census Bureau",
-      "fileSizeMB": 5.0,
-      "numberOfPages": 0,
-      "fileTypes": ["PDF"],
-      "url": "https://example.com/census_2020_us.pdf",
-      "description": "Census document found for query: migration united states california census 2020"
-    }
-  ],
-  "total": 1,
-  "searchTime": 2.3,
-  "query": "migration united states california census 2020"
-}
-```
+8. Test your data
 
-### Download Single Document
-```
-GET /api/download/{document_id}
-```
+GET /api/libraries/ or /api/bureaus/ to confirm entries.
 
-**Response:**
-```json
-{
-  "download_url": "https://example.com/census_2020_us.pdf",
-  "filename": "California Migration Data 2020.pdf",
-  "size_mb": 5.0
-}
-```
+POST /api/search to search census PDFs.
 
-### Download Multiple Documents
-```
-POST /api/download/bulk
-```
-
-**Request Body:**
-```json
-{
-  "document_ids": ["uuid1", "uuid2", "uuid3"]
-}
-```
-
-**Response:** ZIP file containing the documents
-
-### Health Check
-```
-GET /api/health
-```
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2024-01-01T00:00:00Z",
-  "version": "1.0.0"
-}
-```
-
-## Frontend Integration
-
-The frontend React application should be configured to connect to this API:
-
-1. **Environment Variables:**
-   Create a `.env.local` file in the frontend directory:
-   ```
-   VITE_API_BASE_URL=http://localhost:8000/api
-   ```
-
-2. **CORS Configuration:**
-   The API is configured to allow requests from:
-   - `http://localhost:3000`
-   - `http://127.0.0.1:3000`
-
-## Development
-
-- The API uses in-memory caching for search results
-- Search results are stored in `search_cache` dictionary
-- For production, consider using a proper database
-- The API integrates with existing scraping tools in `GoogleSearch_WS/` and `LinkToDownload.py`
-
-## Error Handling
-
-The API returns proper HTTP status codes and error messages:
-
-- `400` - Bad Request (invalid parameters)
-- `404` - Not Found (document not found)
-- `500` - Internal Server Error (search/download failed)
-
-Error responses include a `detail` field with the error message.
-
-##Run FastAPI + MySQL with Docker
-docker compose up -d --build ##Start services
-docker compose ps ##Check status
-
-docker compose exec backend python -m backend.db.create_db  ##Create database tables
-
-access api: http://localhost:8000/docs
+GET /api/download/{id} or POST /api/download/bulk to download results.
