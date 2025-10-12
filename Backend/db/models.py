@@ -22,7 +22,7 @@ class Library(Base):
     result_selector = Column(String(200))
     visible = Column(Boolean, default=True)
     priority = Column(Integer, default=1)
-    country = Column(String(100))
+    country = Column(String(100), nullable=False)
     captcha = Column(Boolean, default=False)
 
 class Bureau(Base):
@@ -41,7 +41,7 @@ class Bureau(Base):
     result_selector = Column(String(200))
     visible = Column(Boolean, default=True)
     priority = Column(Integer, default=1)
-    country = Column(String(100))
+    country = Column(String(100), nullable=False)
     captcha = Column(Boolean, default=False)
 class FilterLink(Base):
     __tablename__ = "filter_links"
