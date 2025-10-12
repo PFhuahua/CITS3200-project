@@ -70,6 +70,17 @@ curl -X POST http://localhost:8000/api/import-libraries
 curl -X POST http://localhost:8000/api/import-bureaus
 ```
 
+For windows PowerShell:
+
+```bash
+# Start the API server
+python start_api.py
+
+# In another terminal, import data
+curl.exe -X POST http://localhost:8000/api/import-libraries
+curl.exe -X POST http://localhost:8000/api/import-bureaus
+```
+
 ### 5. Verify Backend
 
 ```bash
