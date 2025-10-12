@@ -54,10 +54,10 @@ def rank_web_results(Query, ResInfo, max_retries=3, delay=2):
     prompt = (
         f"Search results given: {ResInfo}\n"
         f"Original query: {Query}\n"
-        
+
     )
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-pro",
+        model_name="gemini-2.0-flash",
         system_instruction=(
         "You are a web search result ranking system. You will be given a list of search results and the query string."
         "The search results will be in the format: (URL, file size in bytes or None if unknown, title, snippet)."
@@ -86,10 +86,10 @@ def match_result(Queries, ResInfo, max_retries=3, delay=2):
     prompt = (
         f"Search results given: {ResInfo}\n"
         f"Original query: {Queries}\n"
-        
+
     )
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-pro",
+        model_name="gemini-2.0-flash",
         system_instruction=(
         "You are a search result matching system. You will be given a list of query strings and a dictionary with the library name as key and a list of search results as values."
         "The search results will be in the format: {lib_name: [[URL,contents],[URL2,contents2]]}."

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
@@ -17,6 +17,9 @@ import zipfile
 from datetime import datetime
 import uuid
 import time
+import csv
+import io
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import existing scraping tools
 import sys
@@ -516,6 +519,30 @@ class CascadingSearchResponse(BaseModel):
     time_taken: float
     status: str  # "success" or "no_results"
 
+class BatchSearchItem(BaseModel):
+    row_number: int
+    english_title: str
+    country: str
+    original_title: Optional[str] = None
+    province: Optional[str] = None
+    cite: Optional[str] = None
+    publisher: Optional[str] = None
+    volume: Optional[str] = None
+    coloniser: Optional[str] = None
+
+class BatchSearchResult(BaseModel):
+    row_number: int
+    search_input: BatchSearchItem
+    search_result: Optional[CascadingSearchResponse] = None
+    error: Optional[str] = None
+
+class BatchSearchResponse(BaseModel):
+    total_rows: int
+    successful_searches: int
+    failed_searches: int
+    results: List[BatchSearchResult]
+    total_time_taken: float
+
 @app.post("/api/cascading-search", response_model=CascadingSearchResponse)
 async def cascading_search(request: CascadingSearchRequest):
     """
@@ -735,6 +762,294 @@ async def cascading_search(request: CascadingSearchRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Cascading search failed: {str(e)}")
+
+def perform_single_cascading_search(search_item: BatchSearchItem) -> tuple[int, Optional[CascadingSearchResponse], Optional[str]]:
+    """
+    Helper function to perform a single cascading search.
+    Returns (row_number, result, error)
+    """
+    try:
+        # Build CascadingSearchRequest
+        request = CascadingSearchRequest(
+            englishTitle=search_item.english_title,
+            originalTitle=search_item.original_title,
+            country=search_item.country,
+            province=search_item.province,
+            cite=search_item.cite,
+            publisher=search_item.publisher,
+            volume=search_item.volume,
+            coloniser=search_item.coloniser,
+            numLibResults=2,
+            numBurResults=5,
+            wsResults=5,
+            wsAmt=15,
+            maxWorkers=9
+        )
+
+        start_time = time.time()
+
+        # Build input dictionary for query generation
+        input_dict = {
+            "English Title": request.english_title,
+            "Original Title": request.original_title or "N/A",
+            "Country": request.country,
+            "Province": request.province or "N/A",
+            "Cite": request.cite or "N/A",
+            "Publisher": request.publisher or "N/A",
+            "Volume": request.volume or "N/A",
+            "Coloniser": request.coloniser or "N/A"
+        }
+
+        # Query generation phase
+        doc_info = ", ".join(f"{key}: {value}" for key, value in input_dict.items())
+        queries_json = generate_all_queries(doc_info)
+        all_queries = json.loads(queries_json)
+
+        if not all_queries or not isinstance(all_queries, list) or len(all_queries) < 3:
+            return (search_item.row_number, None, "Invalid query format returned from AI")
+
+        # Phase 1: Library search
+        lib_queries = all_queries[0]
+        lib_all_results = []
+        for query in lib_queries:
+            try:
+                lib_response = Find_Lib_Results(
+                    query.strip(),
+                    [request.country],
+                    request.num_lib_results,
+                    request.max_workers
+                )
+                if not all(v == "" or v == [] for v in lib_response.values()):
+                    lib_all_results.append(lib_response)
+            except Exception as e:
+                print(f"Library search error for row {search_item.row_number}: {e}")
+                continue
+
+        if lib_all_results:
+            try:
+                match_res = match_result(lib_queries, lib_all_results)
+                lib_result = json.loads(match_res)
+                if lib_result and lib_result != []:
+                    lib_time = time.time() - start_time
+                    return (search_item.row_number, CascadingSearchResponse(
+                        phase="library",
+                        queries=lib_queries,
+                        results=lib_result,
+                        time_taken=lib_time,
+                        status="success"
+                    ), None)
+            except Exception as e:
+                print(f"Error matching library results for row {search_item.row_number}: {e}")
+
+        # Phase 2: Bureau search
+        lib_time = time.time()
+        bur_queries = all_queries[1]
+        bur_all_results = []
+        for query in bur_queries:
+            try:
+                bur_response = Find_Bur_Results(
+                    query.strip(),
+                    [request.country],
+                    request.num_bur_results,
+                    request.max_workers
+                )
+                if not all(v == "" or v == [] for v in bur_response.values()):
+                    bur_all_results.append(bur_response)
+            except Exception as e:
+                print(f"Bureau search error for row {search_item.row_number}: {e}")
+                continue
+
+        if bur_all_results:
+            try:
+                match_res = match_result(bur_queries, bur_all_results)
+                bur_result = json.loads(match_res)
+                if bur_result and bur_result != []:
+                    bur_time = time.time() - lib_time
+                    return (search_item.row_number, CascadingSearchResponse(
+                        phase="bureau",
+                        queries=bur_queries,
+                        results=bur_result,
+                        time_taken=bur_time,
+                        status="success"
+                    ), None)
+            except Exception as e:
+                print(f"Error matching bureau results for row {search_item.row_number}: {e}")
+
+        # Phase 3: Web search
+        bur_time = time.time()
+        web_queries = all_queries[2]
+        web_all_results = []
+
+        google_api_key = os.environ.get("GEMINI_API_KEY")
+        search_cx = os.environ.get("SEARCH_ID")
+
+        for query in web_queries:
+            try:
+                web_response = PDF_Google_WS(
+                    query.strip(),
+                    MaxPDFs=request.ws_results,
+                    ResultsSearched=request.ws_amt,
+                    api_key=google_api_key,
+                    Searchcx=search_cx
+                )
+                if web_response:
+                    web_all_results.append(web_response)
+            except Exception as e:
+                print(f"Web search error for row {search_item.row_number}: {e}")
+                continue
+
+        if web_all_results:
+            try:
+                rank_res = rank_web_results(web_queries[0], web_all_results)
+                web_result = json.loads(rank_res)
+                if web_result and web_result != []:
+                    web_time = time.time() - bur_time
+                    return (search_item.row_number, CascadingSearchResponse(
+                        phase="web",
+                        queries=web_queries,
+                        results=web_result[:3],
+                        time_taken=web_time,
+                        status="success"
+                    ), None)
+            except Exception as e:
+                print(f"Error ranking web results for row {search_item.row_number}: {e}")
+
+        # No results found
+        total_time = time.time() - start_time
+        return (search_item.row_number, CascadingSearchResponse(
+            phase="none",
+            queries=web_queries if web_queries else [],
+            results=[],
+            time_taken=total_time,
+            status="no_results"
+        ), None)
+
+    except Exception as e:
+        return (search_item.row_number, None, str(e))
+
+@app.post("/api/batch-search", response_model=BatchSearchResponse)
+async def batch_cascading_search(file: UploadFile = File(...)):
+    """
+    Performs cascading search on multiple rows from a CSV file.
+    CSV should have columns: Title (In English), Country, and optionally:
+    Original title, Province, Date/Year of census, Author/Publisher, Volume number, Colonising power
+    """
+    try:
+        # Check for required API keys
+        if not os.environ.get("GEMINI_API_KEY"):
+            raise HTTPException(
+                status_code=500,
+                detail="GEMINI_API_KEY not configured. Please set the environment variable."
+            )
+
+        # Read CSV file
+        contents = await file.read()
+        csv_text = contents.decode('utf-8')
+        csv_reader = csv.DictReader(io.StringIO(csv_text))
+
+        # Parse CSV rows into BatchSearchItem objects
+        search_items = []
+        for idx, row in enumerate(csv_reader, start=1):
+            # Skip header row if it exists (first row with "Table Name:")
+            if idx == 1 and row.get('Table Name:', '') == 'Table Name:':
+                continue
+
+            # Extract fields from CSV
+            english_title = row.get('Title (In English)', '').strip()
+            country = row.get('Country', '').strip()
+
+            # Skip rows without required fields
+            if not english_title or not country:
+                print(f"Skipping row {idx}: missing required fields (Title or Country)")
+                continue
+
+            search_item = BatchSearchItem(
+                row_number=idx,
+                english_title=english_title,
+                country=country,
+                original_title=row.get('Original title', '').strip() or None,
+                province=row.get('Province', '').strip() or None,
+                cite=row.get('Date/Year of census', '').strip() or None,
+                publisher=row.get('Author/Publisher', '').strip() or None,
+                volume=row.get('Volume number (if applicable)', '').strip() or None,
+                coloniser=row.get('Colonising power', '').strip() or None
+            )
+            search_items.append(search_item)
+
+        if not search_items:
+            raise HTTPException(status_code=400, detail="No valid rows found in CSV file")
+
+        print(f"[BATCH SEARCH] Processing {len(search_items)} items")
+
+        # Perform searches in parallel with ThreadPoolExecutor
+        start_time = time.time()
+        results = []
+        successful = 0
+        failed = 0
+
+        # Use ThreadPoolExecutor for parallel processing
+        max_workers = min(5, len(search_items))  # Limit to 5 concurrent searches
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            future_to_item = {
+                executor.submit(perform_single_cascading_search, item): item
+                for item in search_items
+            }
+
+            # Collect results as they complete
+            for future in as_completed(future_to_item):
+                item = future_to_item[future]
+                try:
+                    row_number, search_result, error = future.result()
+
+                    if error:
+                        failed += 1
+                        results.append(BatchSearchResult(
+                            row_number=row_number,
+                            search_input=item,
+                            search_result=None,
+                            error=error
+                        ))
+                    else:
+                        successful += 1
+                        results.append(BatchSearchResult(
+                            row_number=row_number,
+                            search_input=item,
+                            search_result=search_result,
+                            error=None
+                        ))
+
+                    print(f"[BATCH SEARCH] Completed row {row_number}/{len(search_items)}")
+
+                except Exception as e:
+                    failed += 1
+                    results.append(BatchSearchResult(
+                        row_number=item.row_number,
+                        search_input=item,
+                        search_result=None,
+                        error=str(e)
+                    ))
+                    print(f"[BATCH SEARCH] Error processing row {item.row_number}: {e}")
+
+        # Sort results by row number
+        results.sort(key=lambda x: x.row_number)
+
+        total_time = time.time() - start_time
+
+        print(f"[BATCH SEARCH] Completed: {successful} successful, {failed} failed, {total_time:.2f}s total")
+
+        return BatchSearchResponse(
+            total_rows=len(search_items),
+            successful_searches=successful,
+            failed_searches=failed,
+            results=results,
+            total_time_taken=total_time
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Batch search failed: {str(e)}")
 
 @app.post("/api/search", response_model=SearchResponse)
 async def search_census_documents(request: SearchRequest):
