@@ -160,7 +160,15 @@ Minimal Required Fields
   "Country": "France"
   }
 
-  all other fields are optional and will be auto-filled with default values if not provided
+   all other fields are optional and will be auto-filled with default values if not provided
+While only **`name`**, **`url_start`**, and **`country`** are strictly required,  
+some other fields — such as **`url_end`** —  
+may also be needed depending on how each library or bureau performs its search.  
+
+For more detailed guidance on what each field does and how to obtain these values,  
+please refer to the upcoming *Data Field Guide* written by James.
+  
+  
 
 
 Nested Input Format Supported
