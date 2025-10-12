@@ -29,6 +29,19 @@ API_PORT=8000
 EOF
 ```
 
+For windows PowerShell:
+```bash
+cd Backend
+@"
+GEMINI_API_KEY=your_gemini_api_key_here
+SEARCH_ID=your_google_search_engine_id_here
+DATABASE_URL=mysql://root:@localhost/project
+API_HOST=0.0.0.0
+API_PORT=8000
+"@ | Set-Content .env
+```
+
+
 ### 2. Install Dependencies
 
 ```bash
@@ -55,6 +68,17 @@ python start_api.py
 # In another terminal, import data
 curl -X POST http://localhost:8000/api/import-libraries
 curl -X POST http://localhost:8000/api/import-bureaus
+```
+
+For windows PowerShell:
+
+```bash
+# Start the API server
+python start_api.py
+
+# In another terminal, import data
+curl.exe -X POST http://localhost:8000/api/import-libraries
+curl.exe -X POST http://localhost:8000/api/import-bureaus
 ```
 
 ### 5. Verify Backend
