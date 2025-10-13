@@ -40,31 +40,41 @@ API_HOST=0.0.0.0
 API_PORT=8000
 "@ | Set-Content .env
 ```
+Open a new terminal for changes to the .env file to come into effect. 
 
-
-### 2. Install Dependencies
+### 2. Install Dependencies and activate virtual environment.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Initialize Database
-
-Make sure your MySQL database is running and initialized:
+Then activate the Python virtual environment.
 
 ```bash
-cd db
-python create_db.py
-python seed.py
-cd ..
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+For windows PowerShell:
+```bash
+python3 -m venv .venv
+.\venv\Scripts\Activate.ps1
+```
+
+### 3. Initialize Database
+
+Make sure your docker desktop app is open then initialized:
+
+First open docker desktop.
+```bash
+docker-compose up --build 
+docker exec -it backend bash 
+python -m Backend.db.create_db
 ```
 
 ### 4. Import Libraries and Bureaus
 
 ```bash
-# Start the API server
-python start_api.py
-
 # In another terminal, import data
 curl -X POST http://localhost:8000/api/import-libraries
 curl -X POST http://localhost:8000/api/import-bureaus
@@ -73,9 +83,6 @@ curl -X POST http://localhost:8000/api/import-bureaus
 For windows PowerShell:
 
 ```bash
-# Start the API server
-python start_api.py
-
 # In another terminal, import data
 curl.exe -X POST http://localhost:8000/api/import-libraries
 curl.exe -X POST http://localhost:8000/api/import-bureaus
