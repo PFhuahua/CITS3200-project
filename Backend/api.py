@@ -17,7 +17,7 @@ import zipfile
 from datetime import datetime
 import uuid
 import time
-import csv
+import shutil
 import io
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -29,6 +29,7 @@ from googlesearch import search as google_search
 from GoogleSearch_WS.AITool import generate_all_queries, match_result, rank_web_results
 from GoogleSearch_WS.Func_Library import Find_Lib_Results, Find_Bur_Results
 from GoogleSearch_WS.Func_PDF_GoogleWS import PDF_Google_WS
+from GoogleSearch_WS.convert_metadata_to_list import convert_file
 # Note: LinkToDownload.py is interactive, we'll create a download function
 
 app = FastAPI(
@@ -530,9 +531,14 @@ class BatchSearchItem(BaseModel):
     volume: Optional[str] = None
     coloniser: Optional[str] = None
 
+class BatchTestItem(BaseModel):
+    row_number: int
+    english_title: str
+    country: str
+
 class BatchSearchResult(BaseModel):
     row_number: int
-    search_input: BatchSearchItem
+    search_input: BatchTestItem
     search_result: Optional[CascadingSearchResponse] = None
     error: Optional[str] = None
 
@@ -616,7 +622,7 @@ async def cascading_search(request: CascadingSearchRequest):
                 print(f"[LIBRARY PHASE] Searching with query: {query.strip()}")
                 lib_response = Find_Lib_Results(
                     query.strip(),
-                    [request.country],
+                    [request.country, request.coloniser],
                     request.num_lib_results,
                     request.max_workers
                 )
@@ -661,7 +667,7 @@ async def cascading_search(request: CascadingSearchRequest):
                 print(f"[BUREAU PHASE] Searching with query: {query.strip()}")
                 bur_response = Find_Bur_Results(
                     query.strip(),
-                    [request.country],
+                    [request.country, request.coloniser],
                     request.num_bur_results,
                     request.max_workers
                 )
@@ -928,7 +934,7 @@ def perform_single_cascading_search(search_item: BatchSearchItem) -> tuple[int, 
         return (search_item.row_number, None, str(e))
 
 @app.post("/api/batch-search", response_model=BatchSearchResponse)
-async def batch_cascading_search(file: UploadFile = File(...)):
+async def batch_cascading_search(file: UploadFile = File(...), numlibresults: int =2, numburresults: int =5, websearchresults: int =5, websearchamt: int =15, maxworkers: int =9):
     """
     Performs cascading search on multiple rows from a CSV file.
     CSV should have columns: Title (In English), Country, and optionally:
@@ -941,7 +947,21 @@ async def batch_cascading_search(file: UploadFile = File(...)):
                 status_code=500,
                 detail="GEMINI_API_KEY not configured. Please set the environment variable."
             )
+        
+        suffix = os.path.splitext(getattr(file, "filename", "") or ".csv")[1] or ".csv"
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            file.file.seek(0)
+            shutil.copyfileobj(file.file, tmp)
+            tmp_path = tmp.name
+        try:
+            data = convert_file(tmp_path)
+        finally:
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
 
+        '''
         # Read CSV file
         contents = await file.read()
         csv_text = contents.decode('utf-8')
@@ -975,12 +995,188 @@ async def batch_cascading_search(file: UploadFile = File(...)):
                 coloniser=row.get('Colonising power', '').strip() or None
             )
             search_items.append(search_item)
+        '''
 
-        if not search_items:
+        if not data:
             raise HTTPException(status_code=400, detail="No valid rows found in CSV file")
 
-        print(f"[BATCH SEARCH] Processing {len(search_items)} items")
+        print(f"[BATCH SEARCH] Processing {len(data)} items")
 
+        batch_results = []
+        start = time.time()
+        # Perform searches in sequence
+        successful = 0
+        failed = 0
+        for num, l in enumerate(data, start=1):
+            try:
+                # Query generation phase
+                docInfo = ", ".join(f"{key}: {value}" for key, value in l.items())
+                try:
+                    queries = generate_all_queries(docInfo)
+                    allqueries = json.loads(queries)
+                    if allqueries == []:
+                        print("No queries generated, skipping to next document.")
+                        raise
+                except Exception as e:
+                    print("Error generating queries:", e)
+                    raise
+                print(f"Generated queries: {allqueries}")
+
+                # Library search phase
+                libq = allqueries[0]
+                allresults = []
+                for i in libq:
+                    try:
+                        libresponse = Find_Lib_Results(i.strip(), [l["Country"], l["Colonising power"]], numlibresults, maxworkers)
+                        if all(v == "" for v in libresponse.values()):
+                            print("No library results found.")
+                            continue
+                        #print("Library results found:", libresponse)
+                    except Exception as e:
+                        print("Error in library search:", e)
+                        libresponse = []
+                    allresults.append(libresponse)
+                try:
+                    res = match_result(libq, allresults)
+                    libresult = json.loads(res)
+                except Exception as e:
+                    print("Error matching library results:", e)
+                    continue
+                libend = time.time()
+                print(f"Total library time taken: {libend - start:.4f} seconds")
+                    
+                if libresult and libresult != []:
+                    lib_time = libend - start
+                    successful += 1
+                    batch_results.append(BatchSearchResult(
+                            row_number=num,
+                            search_input=BatchTestItem(
+                                row_number=num,
+                                english_title=l["Title (In English)"],
+                                country=l["Country"]
+                            ),
+                            search_result=CascadingSearchResponse(
+                                phase="library",
+                                queries=libq,
+                                results=libresult,
+                                time_taken=lib_time,
+                                status="success"
+                            ),
+                            error=None
+                    ))
+                    continue
+
+                # Bureau search phase
+                burq = allqueries[1]
+                allresults = []
+                for i in burq:
+                    try:
+                        burresponse = Find_Bur_Results(i.strip(), [l["Country"], l["Colonising power"]], numburresults, maxworkers)
+                        if all(v == "" for v in burresponse.values()):
+                            print("No bureau results found.")
+                            continue
+                        #print("Bureau results found:", burresponse)
+                    except Exception as e:
+                        print("Error in bureau search:", e)
+                        burresponse = []
+                    allresults.append(burresponse)
+                try:
+                    res = match_result(burq, allresults)
+                    burresult = json.loads(res)
+                except Exception as e:
+                    print("Error matching bureau results:", e)
+                    continue
+                burend = time.time()
+                print(f"Total bureau time taken: {burend - libend:.4f} seconds")
+                if burresult and burresult != []:
+                    bur_time = burend - libend
+                    successful += 1
+                    batch_results.append(BatchSearchResult(
+                            row_number=num,
+                            search_input=BatchTestItem(
+                                row_number=num,
+                                english_title=l["Title (In English)"],
+                                country=l["Country"]
+                            ),
+                            search_result=CascadingSearchResponse(
+                                phase="bureau",
+                                queries=burq,
+                                results=burresult,
+                                time_taken=bur_time,
+                                status="success"
+                            ),
+                            error=None
+                    ))
+                    continue
+                
+                # Web search phase
+                google_api_key = os.environ.get("GEMINI_API_KEY")
+                search_cx = os.environ.get("SEARCH_ID")
+                webq = allqueries[2]
+                allresults = []
+                for i in webq:
+                    try:
+                        webresponse = PDF_Google_WS(i.strip(), MaxPDFs=websearchresults, ResultsSearched=websearchamt, api_key=google_api_key, Searchcx=search_cx)
+                        if webresponse == []:
+                            print("No web results found.")
+                            continue
+                    except Exception as e:
+                        print("Error in web search:", e)
+                        webresponse = []
+                    allresults.append(webresponse)
+                try:
+                    res = rank_web_results(webq[0], allresults)
+                    webresult = json.loads(res)
+                    print("Web results matched")
+                except Exception as e:
+                    print("Error matching web results:", e)
+                    continue
+                webend = time.time()
+                if webresult and webresult != []:
+                    web_time = webend - burend
+                    successful += 1
+                    batch_results.append(BatchSearchResult(
+                            row_number=num,
+                            search_input=BatchTestItem(
+                                row_number=num,
+                                english_title=l["Title (In English)"],
+                                country=l["Country"]
+                            ),
+                            search_result=CascadingSearchResponse(
+                                phase="web",
+                                queries=webq,
+                                results=webresult[:3],
+                                time_taken=web_time,
+                                status="success"
+                            ),
+                            error=None
+                    ))
+                    continue
+
+                # No results found
+                total_time = webend - start
+                failed += 1
+                batch_results.append(BatchSearchResult(
+                            row_number=num,
+                            search_input=BatchTestItem(
+                                row_number=num,
+                                english_title=l["Title (In English)"],
+                                country=l["Country"]
+                            ),
+                            search_result=CascadingSearchResponse(
+                                phase="none",
+                                queries=allqueries if allqueries else [],
+                                results=[],
+                                time_taken=total_time,
+                                status="no_results"
+                            ),
+                            error=None
+                    ))
+            except Exception as e:
+                print("An error occurred during the search flow:", e)
+                failed += 1
+                continue
+        '''
         # Perform searches in parallel with ThreadPoolExecutor
         start_time = time.time()
         results = []
@@ -1032,17 +1228,24 @@ async def batch_cascading_search(file: UploadFile = File(...)):
                     print(f"[BATCH SEARCH] Error processing row {item.row_number}: {e}")
 
         # Sort results by row number
-        results.sort(key=lambda x: x.row_number)
+        results.sort(key=lambda x: x.row_number)'''
 
-        total_time = time.time() - start_time
+        total_time = time.time() - start
 
         print(f"[BATCH SEARCH] Completed: {successful} successful, {failed} failed, {total_time:.2f}s total")
-
-        return BatchSearchResponse(
-            total_rows=len(search_items),
+        print(BatchSearchResponse(
+            total_rows=len(data),
             successful_searches=successful,
             failed_searches=failed,
-            results=results,
+            results=batch_results,
+            total_time_taken=total_time
+        ))
+
+        return BatchSearchResponse(
+            total_rows=len(data),
+            successful_searches=successful,
+            failed_searches=failed,
+            results=batch_results,
             total_time_taken=total_time
         )
 

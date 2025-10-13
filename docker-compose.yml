@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: 3200
       MYSQL_DATABASE: project
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - ./mysql_data:/var/lib/mysql
   backend:

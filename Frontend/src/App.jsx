@@ -289,11 +289,18 @@ function App() {
       "Error",
     ];
     const rows = batchResults.results.map((result) => {
-      const firstResult = result.search_result?.results?.[0];
+      const rs = result.search_result?.results || [];
       let resultUrl = "N/A";
 
-      if (firstResult && Array.isArray(firstResult)) {
-        resultUrl = firstResult[1] || "N/A";
+      if (rs.length === 0) {
+        resultUrl = "N/A";
+      } else if (Array.isArray(rs[0])) {
+        resultUrl = rs[0][1] || rs[0][0] || "N/A";
+      } else if (typeof rs[0] === "string") {
+        // flat record: [source, url, title, desc] => url is index 1
+        resultUrl = rs.length >= 2 ? rs[1] || rs[0] : rs[0];
+      } else if (typeof rs[0] === "object") {
+        resultUrl = rs[0].url || rs[0].URL || "N/A";
       }
 
       return [
@@ -881,13 +888,21 @@ function App() {
                                     {result.search_result.results
                                       .slice(0, 2)
                                       .map((res, idx) => {
-                                        const url = Array.isArray(res)
-                                          ? res[1]
-                                          : res.url;
-                                        const title =
-                                          Array.isArray(res) && res[2]
-                                            ? res[2]
-                                            : "View";
+                                        let url = "N/A";
+                                        let title = "View";
+
+                                        if (Array.isArray(res)) {
+                                          // expected order: [source, url, title, description]
+                                          url = res[1] || res[0] || "N/A";
+                                          title = res[2] || res[1] || res[0] || "View";
+                                        } else if (typeof res === "string") {
+                                          url = res;
+                                          title = res;
+                                        } else if (res && typeof res === "object") {
+                                          url = res.url || res.URL || res.link || "N/A";
+                                          title = res.title || res.Title || url;
+                                        }
+
                                         return (
                                           <a
                                             key={idx}

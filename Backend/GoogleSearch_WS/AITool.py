@@ -93,9 +93,9 @@ def match_result(Queries, ResInfo, max_retries=3, delay=2):
         system_instruction=(
         "You are a search result matching system. You will be given a list of query strings and a dictionary with the library name as key and a list of search results as values."
         "The search results will be in the format: {lib_name: [[URL,contents],[URL2,contents2]]}."
-        "Looking at both of the query strings, choose the single URL with the contents that matches the elements mentioned in the query the best."
+        "**IMPORTANT PRIORITY**First scan all of the text given for each result for keywords including 'microform', 'microfilm' and codes like 'FILM 123' and immediately disqualify them no matter how good they are. Completely drop the disqualified results, forget them completely."
+        "After that, looking at both of the query strings, choose the single URL out of the eligible options have the contents that matches the elements mentioned in the query the best."
         "Prioritise exact matches of the name of the census, year of the census, publisher and volume number over the content summary of documents."
-        "For library results make sure to filter out any microfilm or microform type results as they're not useful."
         "If there are no matches, return an empty JSON array."
         "Return the best result as a JSON array, where the array contains [lib_name, URL, File name, Very brief summary of contents]."
         "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."

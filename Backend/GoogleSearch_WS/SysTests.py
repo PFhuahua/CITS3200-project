@@ -62,7 +62,7 @@ def testFlow(inputlist, numlibresults: int =2, numburresults: int =5, websearchr
             allresults = []
             for i in libq:
                 try:
-                    libresponse = Find_Lib_Results(i.strip(), [l["Country"]], numlibresults, maxworkers)
+                    libresponse = Find_Lib_Results(i.strip(), [l["Country"], l["Coloniser"]], numlibresults, maxworkers)
                     if all(v == "" for v in libresponse.values()):
                         print("No library results found.")
                         continue
@@ -92,7 +92,7 @@ def testFlow(inputlist, numlibresults: int =2, numburresults: int =5, websearchr
             allresults = []
             for i in burq:
                 try:
-                    burresponse = Find_Bur_Results(i.strip(), [l["Country"]], numburresults, maxworkers)
+                    burresponse = Find_Bur_Results(i.strip(), [l["Country"], l["Coloniser"]], numburresults, maxworkers)
                     if all(v == "" for v in burresponse.values()):
                         print("No bureau results found.")
                         continue
