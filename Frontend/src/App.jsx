@@ -882,49 +882,143 @@ function App() {
                                   <span className="error-text">
                                     {result.error}
                                   </span>
-                                ) : result.search_result?.results?.length >
-                                  0 ? (
+                                ) : result.search_result?.results?.length > 0 ? (
                                   <div className="result-links">
-                                    {result.search_result.results
-                                      .slice(0, 2)
-                                      .map((res, idx) => {
-                                        let url = "N/A";
-                                        let title = "View";
+                                    {(() => {
+                                      const raw = result.search_result.results || [];
+                                      const isUrl = (s) =>
+                                        typeof s === "string" && /^https?:\/\//i.test(s);
 
+                                      // Normalize similar to before but keep web items (url at index 0)
+                                      const normalize = (r) => {
+                                        if (!r || r.length === 0) return [];
+                                        if (Array.isArray(r[0]) || (typeof r[0] === "object" && r[0] !== null)) {
+                                          return r;
+                                        }
+                                        if (r.every((x) => typeof x === "string")) {
+                                          // try chunk into groups of 4 (lib/bureau records)
+                                          const groupSize = 4;
+                                          if (r.length >= groupSize && r.length % groupSize === 0) {
+                                            const chunks = [];
+                                            for (let i = 0; i < r.length; i += groupSize) {
+                                              chunks.push(r.slice(i, i + groupSize));
+                                            }
+                                            return chunks;
+                                          }
+                                          // detect a URL inside and build a single record
+                                          const urlIndex = r.findIndex(isUrl);
+                                          if (urlIndex !== -1) {
+                                            const source = r[urlIndex - 1] || "N/A";
+                                            const url = r[urlIndex];
+                                            const title = r[urlIndex + 1] || url;
+                                            const desc = r[urlIndex + 2] || "";
+                                            return [[source, url, title, desc]];
+                                          }
+                                        }
+                                        return r;
+                                      };
+
+                                      const items = normalize(raw);
+
+                                      return items.slice(0, 2).map((res, idx) => {
+                                        // array item could be web ([url, size, title, snippet]) OR lib ([source, url, title, desc])
                                         if (Array.isArray(res)) {
-                                          // expected order: [source, url, title, description]
-                                          url = res[1] || res[0] || "N/A";
-                                          title = res[2] || res[1] || res[0] || "View";
-                                        } else if (typeof res === "string") {
-                                          url = res;
-                                          title = res;
-                                        } else if (res && typeof res === "object") {
-                                          url = res.url || res.URL || res.link || "N/A";
-                                          title = res.title || res.Title || url;
+                                          // web result (url at index 0)
+                                          if (isUrl(res[0])) {
+                                            const url = res[0];
+                                            const title = res[2] || url;
+                                            return (
+                                              <a
+                                                key={idx}
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="url-link"
+                                                title={title}
+                                              >
+                                                Result {idx + 1} →
+                                              </a>
+                                            );
+                                          }
+                                          // library/bureau result (url at index 1)
+                                          const source = res[0] || "N/A";
+                                          const url = res[1] || null;
+                                          const title = res[2] || res[1] || source || "View";
+                                          if (url && isUrl(url)) {
+                                            return (
+                                              <a
+                                                key={idx}
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="url-link"
+                                                title={title}
+                                              >
+                                                Result {idx + 1} →
+                                              </a>
+                                            );
+                                          }
+                                          return (
+                                            <span key={idx} className="source-text">
+                                              {source}
+                                            </span>
+                                          );
+                                        }
+
+                                        // string that is a URL
+                                        if (typeof res === "string") {
+                                          if (isUrl(res)) {
+                                            return (
+                                              <a
+                                                key={idx}
+                                                href={res}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="url-link"
+                                              >
+                                                Result {idx + 1} →
+                                              </a>
+                                            );
+                                          }
+                                          return (
+                                            <span key={idx} className="source-text">
+                                              {res}
+                                            </span>
+                                          );
+                                        }
+
+                                        // object with url field
+                                        if (res && typeof res === "object") {
+                                          const url = res.url || res.URL || res.link || null;
+                                          const title = res.title || res.Title || url || "View";
+                                          if (url && isUrl(url)) {
+                                            return (
+                                              <a
+                                                key={idx}
+                                                href={url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="url-link"
+                                                title={title}
+                                              >
+                                                Result {idx + 1} →
+                                              </a>
+                                            );
+                                          }
+                                          return (
+                                            <span key={idx} className="source-text">
+                                              {title}
+                                            </span>
+                                          );
                                         }
 
                                         return (
-                                          <a
-                                            key={idx}
-                                            href={url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="url-link"
-                                            title={title}
-                                          >
-                                            Result {idx + 1} →
-                                          </a>
+                                          <span key={idx} className="source-text">
+                                            N/A
+                                          </span>
                                         );
-                                      })}
-                                    {result.search_result.results.length >
-                                      2 && (
-                                      <span className="more-results">
-                                        +
-                                        {result.search_result.results.length -
-                                          2}{" "}
-                                        more
-                                      </span>
-                                    )}
+                                      });
+                                    })()}
                                   </div>
                                 ) : (
                                   <span className="no-results-text">
