@@ -616,7 +616,7 @@ async def cascading_search(request: CascadingSearchRequest):
                 print(f"[LIBRARY PHASE] Searching with query: {query.strip()}")
                 lib_response = Find_Lib_Results(
                     query.strip(),
-                    [request.country],
+                    [request.country,request.coloniser],
                     request.num_lib_results,
                     request.max_workers
                 )
@@ -661,7 +661,7 @@ async def cascading_search(request: CascadingSearchRequest):
                 print(f"[BUREAU PHASE] Searching with query: {query.strip()}")
                 bur_response = Find_Bur_Results(
                     query.strip(),
-                    [request.country],
+                    [request.country,request.coloniser],
                     request.num_bur_results,
                     request.max_workers
                 )
@@ -815,7 +815,7 @@ def perform_single_cascading_search(search_item: BatchSearchItem) -> tuple[int, 
             try:
                 lib_response = Find_Lib_Results(
                     query.strip(),
-                    [request.country],
+                    [request.country,request.coloniser],
                     request.num_lib_results,
                     request.max_workers
                 )
@@ -827,7 +827,7 @@ def perform_single_cascading_search(search_item: BatchSearchItem) -> tuple[int, 
 
         if lib_all_results:
             try:
-                match_res = match_result(lib_queries, lib_all_results)
+                match_res = match_result(doc_info, lib_all_results)
                 lib_result = json.loads(match_res)
                 if lib_result and lib_result != []:
                     lib_time = time.time() - start_time
@@ -849,7 +849,7 @@ def perform_single_cascading_search(search_item: BatchSearchItem) -> tuple[int, 
             try:
                 bur_response = Find_Bur_Results(
                     query.strip(),
-                    [request.country],
+                    [request.country,request.coloniser],
                     request.num_bur_results,
                     request.max_workers
                 )
@@ -861,7 +861,7 @@ def perform_single_cascading_search(search_item: BatchSearchItem) -> tuple[int, 
 
         if bur_all_results:
             try:
-                match_res = match_result(bur_queries, bur_all_results)
+                match_res = match_result(doc_info, bur_all_results)
                 bur_result = json.loads(match_res)
                 if bur_result and bur_result != []:
                     bur_time = time.time() - lib_time
@@ -988,7 +988,7 @@ async def batch_cascading_search(file: UploadFile = File(...)):
         failed = 0
 
         # Use ThreadPoolExecutor for parallel processing
-        max_workers = min(5, len(search_items))  # Limit to 5 concurrent searches
+        max_workers = min(3, len(search_items))  # Limit to 3 concurrent searches
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # Submit all tasks
             future_to_item = {
@@ -1033,6 +1033,7 @@ async def batch_cascading_search(file: UploadFile = File(...)):
 
         # Sort results by row number
         results.sort(key=lambda x: x.row_number)
+        print(["Search queries generated: "+str(x.search_input) for x in results])
 
         total_time = time.time() - start_time
 
