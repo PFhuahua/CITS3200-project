@@ -1,6 +1,0 @@
-[['The Census of France The Second Series Population 1861', 'Statistique de la France Deuxième Série Population 1861'], ['The Census of France The Second Series Population 1861', 'Statistique de la France Deuxième Série Population 1861'], ['The Census of France Second Series Population 1861 pdf', 'Statistique de la France Deuxième Série Population 1861 pdf']]
-Total library time taken: 139.9478 seconds
-London
-https://librarysearch.lse.ac.uk/discovery/fulldisplay?docid=alma9972959510302021&context=L&vid=44LSE_INST:44LSE_VU1&lang=en&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&tab=Everything&query=any%2Ccontains%2CStatistique%20de%20la%20France%20Deuxi%C3%A8me%20S%C3%A9rie%20Population%201861&offset=0
-Mouvement de la population pendant les années 1855, 1856 et 1857.
-Part of the 'Statistique de la France, 2e Série', this volume from 1861 details population movements in France during 1855, 1856, and 1857.
