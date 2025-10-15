@@ -15,8 +15,8 @@ def generate_all_queries(DocInfo, max_retries=3, delay=2):
             "You will be provided some of the folowing: the name of the document, the country, the province, the year of the census, year of publication, publisher, volume number and more."
             "With these info, you will generate multiple search queries for different cases:"
             "1. A search query that will be best fit for finding a match in big libraries."
-            "   Prioritise the full title and year for the best results. These 2 fields must be in the query for it to have any chance of finding the correct thing UNLESS the title includes the year already."
-            "   Use common sense to decide whether or not to add extra fields. Eg. if there is already a year in the title then don't make it confusing by adding another year."
+            "   The query should be made up of the exact title primarily"
+            "   Next check if the year of the census and the country are in the title, if not add them to the query."
             "   Make sure to fix any typos and accents/special characters in the title."
             "   Do not use double quotes for perfect matches, they're not needed for libs."
             "   Be as concise as you can. Unless the title is very generic do not add any other fields to the query. In fact you will want to remove the tome/volume if they're included in the query."
@@ -54,10 +54,10 @@ def rank_web_results(Query, ResInfo, max_retries=3, delay=2):
     prompt = (
         f"Search results given: {ResInfo}\n"
         f"Original query: {Query}\n"
-        
+
     )
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-pro",
+        model_name="gemini-2.0-flash",
         system_instruction=(
         "You are a web search result ranking system. You will be given a list of search results and the query string."
         "The search results will be in the format: (URL, file size in bytes or None if unknown, title, snippet)."
@@ -86,16 +86,17 @@ def match_result(Queries, ResInfo, max_retries=3, delay=2):
     prompt = (
         f"Search results given: {ResInfo}\n"
         f"Original query: {Queries}\n"
-        
+
     )
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-pro",
+        model_name="gemini-2.0-flash",
         system_instruction=(
-        "You are a search result matching system. You will be given a list of query strings and a dictionary with the library name as key and a list of search results as values."
+        "You are a search result matching system. You will be given a dict with metadata of the doc being searched and a dictionary with the library name as key and a list of search results as values."
         "The search results will be in the format: {lib_name: [[URL,contents],[URL2,contents2]]}."
-        "Looking at both of the query strings, choose the single URL with the contents that matches the elements mentioned in the query the best."
+        "**IMPORTANT PRIORITY**First scan all of the text given for each result for keywords including 'microform', 'microfilm', types like 'book' and codes like 'FILM 123' and immediately disqualify them no matter how good they are. Completely drop the disqualified results, forget them completely."
+        "After that, looking at all the dict metadata, see if any of the result titles and snippets match the document being searched. Remove any results that are irrelevant. Note we are looking for data not preview or summaries unless specified in the doc info."
+        "Choose the single URL out of the eligible options with the contents that matches the doc being searched the best."
         "Prioritise exact matches of the name of the census, year of the census, publisher and volume number over the content summary of documents."
-        "For library results make sure to filter out any microfilm or microform type results as they're not useful."
         "If there are no matches, return an empty JSON array."
         "Return the best result as a JSON array, where the array contains [lib_name, URL, File name, Very brief summary of contents]."
         "Do not include any explanation or formatting outside the JSON. DO NOT USE TRIPLE QUOTES FOR CODE SNIPPETS."

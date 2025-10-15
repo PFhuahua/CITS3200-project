@@ -1,6 +1,6 @@
 import requests
-from ScraperTool import scrape_pdfs
-from ScraperTool import process_pdf_link
+from ..ScraperTool import scrape_pdfs
+from ..ScraperTool import process_pdf_link
 import time
 
 
@@ -32,7 +32,7 @@ start_search_index = 1 # Start index of searches (1)
 while start_search_index <= ResultsSearched:
     # Determine how many results to request in the search (API only allows a max of 10 per search)
     num_results = min(ResultsSearched - start_search_index + 1, 10)
-    
+
     url = f"https://www.googleapis.com/customsearch/v1?q={Query}&key={api_key}&cx={Searchcx}&num={num_results}&start={start_search_index}"
     response = requests.get(url)
     print(f"Requesting results {start_search_index}-{start_search_index+num_results-1}, status:", response.status_code)
@@ -65,10 +65,10 @@ while start_search_index <= ResultsSearched:
                 break
     else:
         print("Error:", response.status_code, response.text)
-    
+
     if len(results) >= MaxPDFs:
         break
-    
+
     start_search_index += num_results  # Move to next block of results
 
 unique_results = list(set(results))

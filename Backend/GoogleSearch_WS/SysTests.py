@@ -1,8 +1,8 @@
-from AITool import rank_web_results, match_result, generate_all_queries
-from Func_PDF_GoogleWS import PDF_Google_WS
+from .AITool import rank_web_results, match_result, generate_all_queries
+from .Func_PDF_GoogleWS import PDF_Google_WS
 from dotenv import load_dotenv
-from convert_metadata_to_list import convert_file
-from Func_Library import Find_Lib_Results, Find_Bur_Results,integrate_db_call
+from .convert_metadata_to_list import convert_file
+from .Func_Library import Find_Lib_Results, Find_Bur_Results
 import google.generativeai as genai
 import os
 import time
@@ -116,7 +116,7 @@ def testFlow(inputlist, numlibresults: int =2, numburresults: int =5, websearchr
                 print("Bureau result found, written to file")
                 continue
             print("No bureau results found, proceeding to web search.")
-            
+
             # Web search phase
             webq = allqueries[2]
             allresults = []
@@ -239,7 +239,7 @@ def singleFlow(inputdict, numlibresults: int = 2, numburresults: int = 5, wsresu
         if burresult != []:
             return endres
         print("No bureau results found, proceeding to web search.")
-        
+
         # Web search phase
         webq = allqueries[2]
         allresults = []

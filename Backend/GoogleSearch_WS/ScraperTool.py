@@ -125,6 +125,10 @@ def Scrape_Page(url: str, selector: str, visible: bool = False, headless: bool =
         browser = p.chromium.launch(headless=headless,   args=['--no-sandbox', '--disable-setuid-sandbox'])
         page = browser.new_page()
         page.goto(url)
+        
+        # Fall back for selector non entry to wait till timeout
+        if selector == '':
+            selector = ":root:has(.no_such_class)"
 
         # Fall back for selector non entry to wait till timeout
         if selector == '':
@@ -166,7 +170,7 @@ def Hyperlink_Extractor(html,attrs,tag,tag_class):
 
     soup = BeautifulSoup(html, "html.parser")
 
-    # find <h3 class="item-title">, then get <a> inside it
+    #  find <h3 class="item-title">, then get <a> inside it
     links = []
 
     # Fall back for tag/class non entry to Check all Html for links with Attr

@@ -1,143 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 220 70% 50%;
-    --primary-foreground: 210 40% 98%;
-    --primary-hover: 220 70% 45%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 220 70% 50%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 220 70% 50%;
-
-    /* Census-specific design tokens */
-    --census-blue: 220 70% 50%;
-    --census-blue-dark: 220 70% 40%;
-    --census-blue-light: 220 70% 95%;
-    --census-gradient: linear-gradient(135deg, hsl(220 70% 50%) 0%, hsl(240 70% 60%) 100%);
-    --world-map-bg: linear-gradient(135deg, hsl(220 70% 30%) 0%, hsl(240 70% 50%) 50%, hsl(220 70% 40%) 100%);
-    --glass-bg: hsla(0, 0%, 100%, 0.1);
-    --glass-border: hsla(0, 0%, 100%, 0.2);
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 220 70% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --primary-hover: 220 70% 55%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 220 70% 60%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 220 70% 60%;
-
-    /* Dark mode census tokens */
-    --census-blue: 220 70% 60%;
-    --census-blue-dark: 220 70% 50%;
-    --census-blue-light: 220 70% 15%;
-    --census-gradient: linear-gradient(135deg, hsl(220 70% 40%) 0%, hsl(240 70% 50%) 100%);
-    --world-map-bg: linear-gradient(135deg, hsl(220 70% 20%) 0%, hsl(240 70% 30%) 50%, hsl(220 70% 25%) 100%);
-    --glass-bg: hsla(0, 0%, 0%, 0.3);
-    --glass-border: hsla(0, 0%, 100%, 0.1);
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #213547;
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
+body {
+  margin: 0;
+  min-height: 100vh;
 }
 
-/* Custom utility classes for census app */
-@layer utilities {
-  .world-map-bg {
-    background: var(--world-map-bg);
-    background-attachment: fixed;
-  }
-  
-  .glass-effect {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-  }
-  
-  .census-gradient {
-    background: var(--census-gradient);
-  }
+#root {
+  min-height: 100vh;
 }

@@ -1,6 +1,6 @@
 import requests
-from ScraperTool import scrape_pdfs
-from ScraperTool import process_pdf_link
+from .ScraperTool import scrape_pdfs
+from .ScraperTool import process_pdf_link
 
 """
     Search for PDFs using Google Custom Search API and Return Results into a List of Tuples.
@@ -35,7 +35,7 @@ def PDF_Google_WS(
     while start_search_index <= ResultsSearched:
         # Determine how many results to request in the search (API only allows a max of 10 per search)
         num_results = min(ResultsSearched - start_search_index + 1, 10)
-        
+
         url = f"https://www.googleapis.com/customsearch/v1?q={Query}&key={api_key}&cx={Searchcx}&num={num_results}&start={start_search_index}"
         try:
             response = requests.get(url)
@@ -73,10 +73,10 @@ def PDF_Google_WS(
                     break
         else:
             print("Error:", response.status_code, response.text)
-        
+
         if len(results) >= MaxPDFs:
             break
-        
+
         start_search_index += num_results  # Move to next block of results
 
     #print(results)
@@ -93,7 +93,7 @@ def PDF_Google_WS(
 
 """
     Search Lib matches using Google Custom Search API and Return Results into a List of Tuples.
-    
+
     Parameters:
     - ExactTags: list of strings to match exactly
     - NonExactTags: list of strings to include in search
@@ -102,7 +102,7 @@ def PDF_Google_WS(
     - ResultsSearched: total number of search results to scan
     - api_key: Google API key
     - Searchcx: Google Custom Search Engine ID
-    
+
     Returns:
     - unique_results: list of tuples (PDF URL, PDF size in bytes or None, Title, Snippet)
 """
@@ -126,7 +126,7 @@ def LIB_Google_WS(
     while start_search_index <= ResultsSearched:
         # Determine how many results to request in the search (API only allows a max of 10 per search)
         num_results = min(ResultsSearched - start_search_index + 1, 10)
-        
+
         url = f"https://www.googleapis.com/customsearch/v1?q={Query}&key={api_key}&cx={Searchcx}&num={num_results}&start={start_search_index}"
         response = requests.get(url)
         print(f"Requesting results {start_search_index}-{start_search_index+num_results-1}, status:", response.status_code)
@@ -140,17 +140,17 @@ def LIB_Google_WS(
                 title = item['title']
                 snippet = item['snippet']
 
-                if not any(f in link for f in Filters):   
+                if not any(f in link for f in Filters):
                     print(link)
                     results.append([link,title,snippet])
                 if len(results) >= MaxHTML:
                     break
         else:
             print("Error:", response.status_code, response.text)
-        
+
         if len(results) >= MaxHTML:
             break
-        
+
         start_search_index += num_results  # Move to next block of results
 
 
@@ -159,4 +159,4 @@ def LIB_Google_WS(
         print(f"{i}. {url[0]} \nTitle: {url[1]}, \nsnippet: {url[2]}\n")
     print("\n")
 
-    return(results) # Website URL, Website Title, Website Snippet    
+    return(results) # Website URL, Website Title, Website Snippet
