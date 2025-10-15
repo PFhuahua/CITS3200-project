@@ -35,6 +35,33 @@ echo.
 echo [INFO] Importing libraries and bureaus...
 docker-compose exec backend python -c "import requests; requests.post('http://localhost:8000/api/import-libraries'); requests.post('http://localhost:8000/api/import-bureaus')"
 
+REM --- Step 4: Check Node.js installation and install if missing ---
+echo.
+node --version >nul 2>&1
+if errorlevel 1 (
+    echo [INFO] Node.js not found. Installing via winget...
+    winget install --id=OpenJS.NodeJS -e --silent
+    if errorlevel 1 (
+        echo [ERROR] Node.js installation failed. Please install manually from https://nodejs.org/
+        pause
+        exit /b 1
+    )
+) else (
+    echo [INFO] Node.js version:
+    node --version
+)
+
+REM --- Step 5: Check npm installation ---
+npm --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] npm not found. Node.js installation may have failed.
+    pause
+    exit /b 1
+) else (
+    echo [INFO] npm version:
+    npm --version
+)
+
 echo.
 echo [SUCCESS] Backend setup complete. Keep this window open to monitor logs.
 pause
