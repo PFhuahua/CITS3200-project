@@ -39,6 +39,34 @@ The system consists of three main components:
 - **MySQL 8.0+** database server
 - **Docker & Docker Compose** (optional, for containerized setup)
 
+## Quickest Method (Windows):
+
+# 1.
+Run the backend & database setup (keep this terminal running during program):
+   ```bash
+   call .\setup.bat
+   ```
+
+   Wait in this terminal until you see messages like:
+
+   backend  | INFO:     Started server process [9]
+   backend  | INFO:     Waiting for application startup.
+   backend  | INFO:     Application startup complete.
+
+# 2. 
+   Open a new terminal and start the frontend (also keep this terminal running during program):
+
+   ```bash
+   call .\setup2.bat
+   ```
+
+# 3.
+   Open the application in your browser:
+
+   http://localhost:5173/
+
+   done!
+
 ### 🐳 Docker Setup (Recommended)
 
 The fastest way to get started:
