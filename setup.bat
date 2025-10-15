@@ -9,18 +9,18 @@ echo ===============================================
 echo 🚀 Starting Backend Setup...
 echo ===============================================
 
-REM --- Step 1: Ensure .env file exists ---
-if not exist ".env" (
-    echo [INFO] .env file not found. Creating default .env...
+REM --- Step 1: Ensure .env file exists in Backend ---
+if not exist "Backend\.env" (
+    echo [INFO] .env file not found in Backend. Creating default .env...
     (
         echo GEMINI_API_KEY=your_gemini_api_key_here
         echo SEARCH_ID=your_google_search_engine_id_here
         echo DATABASE_URL=mysql+pymysql://root:3200@localhost:3306/project
-    ) > .env
-    echo [SUCCESS] Default .env file created.
-    echo ⚠️  Please edit .env and add your real API keys if needed.
+    ) > Backend\.env
+    echo [SUCCESS] Default .env file created in Backend.
+    echo ⚠️  Please edit Backend\.env and add your real API keys if needed.
 ) else (
-    echo [INFO] .env already exists. Skipping creation.
+    echo [INFO] Backend\.env already exists. Skipping creation.
 )
 
 REM --- Step 2: Start Docker containers in foreground ---
