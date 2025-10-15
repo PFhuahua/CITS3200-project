@@ -37,11 +37,17 @@ The system consists of three main components:
 - **Python 3.8+** with pip
 - **Node.js 16+** with npm
 - **MySQL 8.0+** database server
-- **Docker & Docker Compose** (optional, for containerized setup)
+- **Docker & Docker Compose**
+
+
+# Install Docker Desktop（Register for free）
+# https://www.docker.com/products/docker-desktop
+
 
 ## Quickest Method (Windows):
 
 # 1.
+Make sure Docker Desktop is installed and the program opened before continuing
 Run the backend & database setup (keep this terminal running during program):
    ```bash
    call .\setup.bat
