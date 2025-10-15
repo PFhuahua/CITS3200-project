@@ -50,7 +50,7 @@ The system consists of three main components:
 Make sure Docker Desktop is installed and the program opened before continuing
 Run the backend & database setup (keep this terminal running during program):
    ```bash
-   call .\setup.bat
+   call .\Load_Backend.bat
    ```
 
    Wait in this terminal until you see messages like:
@@ -63,7 +63,7 @@ Run the backend & database setup (keep this terminal running during program):
    Open a new terminal and start the frontend (also keep this terminal running during program):
 
    ```bash
-   call .\setup2.bat
+   call .\Load_Frontend.bat
    ```
 
 # 3.
