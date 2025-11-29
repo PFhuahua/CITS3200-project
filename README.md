@@ -1,5 +1,16 @@
 # CITS3200 Project - Census Document Discovery System
 
+## Quick Installation Guide
+
+1. Download zip folder of project from Github: https://github.com/PFhuahua/CITS3200-project
+2. Install docker desktop: https://www.docker.com/products/docker-desktop
+3. Open CMD or Powershell and install node.js via the command `winget install OpenJS.NodeJS` for windows
+4. Set up API key for AI model and Search engine (Already done)
+5. Run Load_Backend.bat under the root folder
+6. Fill in the `.env` file generated inside the backend folder with API keys and move to root folder (Already done)
+7. Run Load_Frontend.bat
+8. To run the application run both Load_Backend and Load_Frontend and go to the localhost address given by the frontend terminal
+
 ## 🎯 Project Overview
 
 **Documentation Identification Software/AI Agent**
