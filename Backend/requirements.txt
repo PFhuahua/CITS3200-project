@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-multipart
+requests
+google
+python-dotenv
+googlesearch-python
+sqlalchemy
+pymysql
+cryptography
+google-generativeai
+beautifulsoup4
+playwright[browsers]
+pandas
+openpyxl

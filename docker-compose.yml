@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 3200
+      MYSQL_DATABASE: project
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+  backend:
+    build: ./Backend
+    shm_size: '2gb'
+    mem_limit: '4g'
+    container_name: backend
+    volumes:
+      - ./Backend:/app/Backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:3200@db:3306/project
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SEARCH_ID=${SEARCH_ID}
+    depends_on:
+      - db
